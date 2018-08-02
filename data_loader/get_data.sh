@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 if ! [ -f boat_data.zip ]; then
-  aws s3 cp s3://taylor-hackathon/boat_data.zip .
+  aws s3 cp s3://taylor-hackathon9/boat_data.zip .
   unzip boat_data.zip
 fi
 mkdir -p train test
