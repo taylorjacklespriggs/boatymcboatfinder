@@ -8,15 +8,47 @@ app = Flask(__name__)
 app.debug = True
 samples = load_samples()
 
+full_image_size = 768
+
+
+class Subsample(object):
+  def __init__(self, image_size, sample):
+    self.sample = sample
+    self.image_size = image_size
+    center_index = np.random.choice(np.concatenate(tuple(
+      np.arange(segment.start, segment.start+segment.run)
+      for segment in sample.segmentations
+    )))
+    center_index = center_index // full_image_size, center_index % full_image_size
+    (self.i_min, self.i_max), (self.j_min, self.j_max) = map(self._get_boundaries, center_index)
+
+  def _get_boundaries(self, idx):
+    idx -= self.image_size // 2
+    start = max(0, min(idx, full_image_size - self.image_size))
+    end = start + self.image_size
+    return start, end
+
+  def _splice(self, img):
+    return img[self.i_min:self.i_max, self.j_min:self.j_max].copy()
+
+  def load_image(self):
+    return self._splice(self.sample.load_image())
+
+  def load_mask(self):
+    mask = np.zeros((full_image_size, full_image_size, 1), dtype=np.uint8)
+    self.sample.apply_segmentations(mask, 1)
+    return self._splice(mask)
+
+
 class SampleReader(object):
   closed = False
 
   def __init__(self, batch_size, image_size):
     self.image_size = image_size
-    self.samples = np.random.choice(samples, batch_size)
+    self.samples = [Subsample(self.image_size, sample) for sample in np.random.choice(samples, batch_size)]
     self.buffers = (self._wrap_buffer(img) for images in (
       (sample.load_image() for sample in self.samples),
-      (self._load_mask(sample) for sample in self.samples),
+      (sample.load_mask() for sample in self.samples),
     ) for img in images)
     self.current_buffer = next(self.buffers)
 
@@ -25,11 +57,6 @@ class SampleReader(object):
     buff.write(memoryview(img))
     buff.seek(0)
     return buff
-
-  def _load_mask(self, sample):
-    mask = np.zeros((self.image_size, self.image_size, 1), dtype=np.uint8)
-    sample.apply_segmentations(mask, 1)
-    return mask
 
   def readinto(self, buff):
     data = self.current_buffer.read(len(buff))

@@ -31,11 +31,11 @@ class Sample(object):
   def __repr__(self):
     return 'Sample(n_segmentations={})'.format(len(self.segmentations))
 
-def load_samples(filename='train_ship_segmentations.csv'):
+def load_samples(filename='train_ship_segmentations.csv', include_blanks=False):
   with open(filename) as segmentations_fp:
     # skip the header line
     next(segmentations_fp)
-    return [Sample(line) for line in segmentations_fp]
+    return [sample for sample in (Sample(line) for line in segmentations_fp) if include_blanks or sample.segmentations]
 
 if __name__ == '__main__':
   sample = next(iter(load_samples()))
