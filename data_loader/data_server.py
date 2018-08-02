@@ -43,7 +43,6 @@ def train_batch():
   batch_size = int(request.args.get('batch_size', '1'))
   image_size = int(request.args.get('image_size', '768'))
 
-  random_samples = np.random.choice(
   return send_file(
     io.BufferedReader(SampleReader(batch_size, image_size)),
     attachment_filename='batch.raw',
