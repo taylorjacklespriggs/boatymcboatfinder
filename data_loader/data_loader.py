@@ -17,6 +17,8 @@ class Sample(object):
 
 def load_samples(filename='train_ship_segmentations.csv'):
   with open(filename) as segmentations_fp:
+    # skip the header line
+    next(segmentations_fp)
     return [Sample(line) for line in segmentations_fp]
 
 if __name__ == '__main__':
