@@ -7,7 +7,7 @@ class Segmentation(object):
     self.run = run
 
   def apply_to_image(self, image, value):
-    image.reshape((-1, image.shape[-1]))[self.start:self.start+self.end] = value
+    image.reshape((-1, image.shape[-1]))[self.start:self.start+self.run] = value
 
   def __repr__(self):
     return 'Segmentation(start={}, run={})'.format(self.start, self.run)
