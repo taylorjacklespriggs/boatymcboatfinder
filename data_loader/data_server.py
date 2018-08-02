@@ -13,24 +13,29 @@ class SampleReader(object):
 
   def __init__(self, batch_size, image_size):
     self.image_size = image_size
-    self.samples = (self._load_next_image(sample) for sample in np.random.choice(samples, batch_size))
-    self.current_buffer = next(self.samples)
+    self.samples = np.random.choice(samples, batch_size)
+    self.buffers = (self._wrap_buffer(img) for images in (
+      (sample.load_image() for sample in self.samples),
+      (self._load_mask(sample) for sample in self.samples),
+    ) for img in images)
+    self.current_buffer = next(self.buffers)
 
-  def _load_next_image(self, sample):
-    stream = io.BytesIO()
-    image = sample.load_image()
-    stream.write(memoryview(image))
-    mask = np.zeros(image.shape[:2], dtype=np.uint8)
+  def _wrap_buffer(self, img):
+    buff = io.BytesIO()
+    buff.write(memoryview(img))
+    buff.seek(0)
+    return buff
+
+  def _load_mask(self, sample):
+    mask = np.zeros((self.image_size, self.image_size, 1), dtype=np.uint8)
     sample.apply_segmentations(mask, 1)
-    stream.write(memoryview(mask))
-    stream.seek(0)
-    return stream
+    return mask
 
   def readinto(self, buff):
     data = self.current_buffer.read(len(buff))
     if not data:
       try:
-        self.current_buffer = next(self.samples)
+        self.current_buffer = next(self.buffers)
         data = self.current_buffer.read(len(buff))
       except StopIteration:
         pass
