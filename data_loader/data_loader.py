@@ -24,6 +24,10 @@ class Sample(object):
     image_data = np.asarray(pil_image, dtype=np.int32).transpose((1, 0, 2)).copy()
     return image_data
 
+  def apple_segmentations(self, image, value):
+    for segmentation in self.segmentations:
+      segmentation.apply_to_image(image, value)
+
   def __repr__(self):
     return 'Sample(n_segmentations={})'.format(len(self.segmentations))
 
