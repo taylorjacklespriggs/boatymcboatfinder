@@ -1,3 +1,6 @@
+import numpy as np
+from PIL import Image
+
 class Segmentation(object):
   def __init__(self, start, run):
     self.start = start
