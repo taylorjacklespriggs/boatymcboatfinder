@@ -19,7 +19,7 @@ class Sample(object):
     self.segmentations = [Segmentation(start_px, run) for start_px, run in zip(segmentation[::2], segmentation[1::2])]
 
   def load_image(self):
-    pil_image = Image.open(self.image)
+    pil_image = Image.open('train/{}'.format(self.image))
     pil_image.load()
     image_data = np.asarray(pil_image, dtype=np.int32).transpose((1, 0, 2)).copy()
     return image_data
