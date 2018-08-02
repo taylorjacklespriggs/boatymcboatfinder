@@ -6,4 +6,4 @@ class Sample(object):
 
 def load_segmentations(filename='train_ship_segmentations.csv'):
   with open(filename) as segmentations_fp:
-    training_samples = [Sample(line) for line in segmentations_fp]
+    return [Sample(line) for line in segmentations_fp]
