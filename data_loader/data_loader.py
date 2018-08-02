@@ -9,7 +9,7 @@ class Segmentation(object):
 class Sample(object):
   def __init__(self, line):
     self.image, segmentation = line[:-1].split(',')
-    segmentation = list(map(int, segmentation.split(' ')))
+    segmentation = list(map(int, segmentation.split(' '))) if segmentation else []
     self.segmentations = [Segmentation(start_px, run) for start_px, run in zip(segmentation[::2], segmentation[1::2])]
 
   def __repr__(self):
