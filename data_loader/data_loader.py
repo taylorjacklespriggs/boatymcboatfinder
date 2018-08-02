@@ -3,6 +3,9 @@ class Segmentation(object):
     self.start = start
     self.run = run
 
+  def apply_to_image(self, image, value):
+    image.reshape((-1, image.shape[-1]))[self.start:self.start+self.end] = value
+
   def __repr__(self):
     return 'Segmentation(start={}, run={})'.format(self.start, self.run)
 
@@ -11,6 +14,12 @@ class Sample(object):
     self.image, segmentation = line[:-1].split(',')
     segmentation = list(map(int, segmentation.split(' '))) if segmentation else []
     self.segmentations = [Segmentation(start_px, run) for start_px, run in zip(segmentation[::2], segmentation[1::2])]
+
+  def load_image(self):
+    pil_image = Image.open(self.image)
+    pil_image.load()
+    image_data = np.asarray(pil_image, dtype=np.int32).transpose((1, 0, 2)).copy()
+    return image_data
 
   def __repr__(self):
     return 'Sample(n_segmentations={})'.format(len(self.segmentations))
