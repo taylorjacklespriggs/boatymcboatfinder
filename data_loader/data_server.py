@@ -5,6 +5,7 @@ import numpy as np
 from data_loader import load_samples
 
 app = Flask(__name__)
+app.debug = True
 samples = load_samples()
 
 class SampleReader(object):
@@ -22,10 +23,10 @@ class SampleReader(object):
     except StopIteration:
       return
     image = sample.load_image()
-    self.stream.write(image.getbuffer())
+    self.stream.write(memoryview(image))
     mask = np.zeros(image.shape[:2], dtype=np.uint8)
     sample.apply_segmentations(mask, 1)
-    self.stream.write(mask.get_buffer())
+    self.stream.write(memoryview(mask))
     self.stream.seek(0)
 
   def read(size=-1):
