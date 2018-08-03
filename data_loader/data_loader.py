@@ -21,8 +21,8 @@ class Sample(object):
   def load_image(self):
     pil_image = Image.open('train/{}'.format(self.image))
     pil_image.load()
-    image_data = np.asarray(pil_image, dtype=np.int32).transpose((1, 0, 2)).copy()
-    return image_data
+    flat_data = np.asarray(pil_image, dtype=np.int32).astype(np.uint8)
+    return flat_data.transpose((1, 0, 2)).copy()
 
   def apply_segmentations(self, image, value):
     for segmentation in self.segmentations:

@@ -1,10 +1,12 @@
 import tensorflow as tf
 
-import galileo_io
+try:
+  import galileo_io
+  assignments = galileo_io.suggestion.assignments.copy()
+except ImportError:
+  assignments = {}
 
-assignments = galileo_io.suggestion.assignments.copy()
-
-image_size = assignments['image_size']
+image_size = assignments.setdefault('image_size', 768)
 
 x = tf.placeholder("float", [None, None, None, 3])
 y = tf.placeholder("float", [None, None, None, 1])
@@ -21,4 +23,4 @@ optimizers = {
   'adam': tf.train.AdamOptimizer,
 }
 
-optimizer = optimizers[assignments['optimizer']]
+optimizer = optimizers[assignments.setdefault('optimizer', 'adam')]

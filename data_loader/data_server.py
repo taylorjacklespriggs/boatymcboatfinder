@@ -7,10 +7,16 @@ from data_loader import load_samples
 app = Flask(__name__)
 app.debug = True
 samples = load_samples()
-split = len(samples) // 5
+split = len(samples) // 100
+print(split)
 evaluation_samples, training_samples = samples[:split], samples[split:]
 
 full_image_size = 768
+
+def load_mask(sample):
+  mask = np.zeros((full_image_size, full_image_size, 1), dtype=np.uint8)
+  sample.apply_segmentations(mask, 1)
+  return mask
 
 
 class Subsample(object):
@@ -37,25 +43,15 @@ class Subsample(object):
     return self._splice(self.sample.load_image())
 
   def load_mask(self):
-    mask = np.zeros((full_image_size, full_image_size, 1), dtype=np.uint8)
-    self.sample.apply_segmentations(mask, 1)
-    return self._splice(mask)
+    return self._splice(load_mask(self.sample))
 
 
 class ImageReader(object):
   closed = False
 
-  def __init__(self, image_gen):
-    self.image_size = image_size
-    self.samples = [
-      Subsample(self.image_size, sample)
-      for sample in np.random.choice(training_samples, batch_size)
-    ]
-    self.buffers = (self._wrap_buffer(img) for images in (
-      (sample.load_image() for sample in self.samples),
-      (sample.load_mask() for sample in self.samples),
-    ) for img in images)
-    self.current_buffer = next(self.buffers)
+  def __init__(self, shape, image_gen):
+    self.buffers = (self._wrap_buffer(img) for img in image_gen)
+    self.current_buffer = self._wrap_buffer(np.array(shape, dtype=np.uint32))
 
   def _wrap_buffer(self, img):
     buff = io.BytesIO()
@@ -99,16 +95,22 @@ def train_batch():
   ) for img in images)
 
   return send_file(
-    io.BufferedReader(SampleReader(images)),
+    io.BufferedReader(ImageReader((batch_size, image_size, image_size), images)),
     attachment_filename='batch.raw',
     mimetype='application/octet-stream',
   )
 
 @app.route('/evaluation_batch')
 def evaluation_batch():
-  images = (sample.load_image() for sample in evaluation_samples)
+  images = (img for images in (
+    (sample.load_image() for sample in evaluation_samples),
+    (load_mask(sample) for sample in evaluation_samples),
+  ) for img in images)
   return send_file(
-    io.BufferedReader(SampleReader(images)),
+    io.BufferedReader(ImageReader((len(evaluation_samples), 768, 768), images)),
     attachment_filename='batch.raw',
     mimetype='application/octet-stream',
   )
+
+if __name__ == '__main__':
+  app.run(host='0.0.0.0')
