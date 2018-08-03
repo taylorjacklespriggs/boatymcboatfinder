@@ -9,14 +9,14 @@ def evaluate_model(session, model, evaluation_data):
   count = 10
   x_eval, y_eval = evaluation_data
   n = 0
-  loss_total = 0.
-  error_total = 0.
+  blank_total = 0.
+  boats_total = 0.
   for i in range(0, len(x_eval), count):
       end = min(i + count, len(x_eval))
       spliced = x_eval[i:end], y_eval[i:end]
       blank, boat = model.evaluate(session, spliced)
       blank_total += blank
-      boat_total += boat
+      boats_total += boat
       n += 1
       print('average blank', blank_total / n, 'boats', boats_total / n)
   return blank_total / n, boats_total / n
@@ -52,7 +52,7 @@ def train_and_evaluate(model_gen):
     start_eval = time.time()
     blank_loss, boat_loss = evaluate_model(sess, model, evaluation_data)
     galileo_io.log_metric('negative_eval_time', start_eval - time.time())
-    print('final blank', blank_loss, 'boats', boats_loss)
+    print('final blank', blank_loss, 'boats', boat_loss)
     galileo_io.log_metadata('blank_loss', blank_loss)
     galileo_io.log_metadata('boat_loss', boat_loss)
     galileo_io.log_metric('negative_log_loss', -math.log(blank_loss + boat_loss))
