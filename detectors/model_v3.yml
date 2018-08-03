@@ -1,4 +1,4 @@
-name: Boaty McBoatfinder V2
+name: Boaty McBoatfinder V3
 resources_per_model:
   gpus: 1
 framework: tensorflow
@@ -55,12 +55,6 @@ optimization:
       bounds:
         min: 2
         max: 9
-    - name: output_act
-      type: categorical
-      categorical_values:
-        - relu
-        - sigmoid
-        - tanh
     - name: optimizer
       type: categorical
       categorical_values:
@@ -100,4 +94,4 @@ aws:
   aws_access_key_id:
   aws_secret_access_key:
   ecr:
-    repository: galileo/bmbf-v2
+    repository: galileo/bmbf-v3

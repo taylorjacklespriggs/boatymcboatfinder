@@ -35,12 +35,6 @@ optimization:
       bounds:
         min: 2
         max: 9
-    - name: output_act
-      type: categorical
-      categorical_values:
-        - relu
-        - sigmoid
-        - tanh
     - name: optimizer
       type: categorical
       categorical_values:
