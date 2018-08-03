@@ -7,6 +7,8 @@ from data_loader import load_samples
 app = Flask(__name__)
 app.debug = True
 samples = load_samples()
+split = len(samples) // 5
+evaluation_samples, training_samples = samples[:split], samples[split:]
 
 full_image_size = 768
 
@@ -40,12 +42,15 @@ class Subsample(object):
     return self._splice(mask)
 
 
-class SampleReader(object):
+class ImageReader(object):
   closed = False
 
-  def __init__(self, batch_size, image_size):
+  def __init__(self, image_gen):
     self.image_size = image_size
-    self.samples = [Subsample(self.image_size, sample) for sample in np.random.choice(samples, batch_size)]
+    self.samples = [
+      Subsample(self.image_size, sample)
+      for sample in np.random.choice(training_samples, batch_size)
+    ]
     self.buffers = (self._wrap_buffer(img) for images in (
       (sample.load_image() for sample in self.samples),
       (sample.load_mask() for sample in self.samples),
@@ -84,8 +89,26 @@ def train_batch():
   batch_size = int(request.args.get('batch_size', '1'))
   image_size = int(request.args.get('image_size', '768'))
 
+  subsamples = [
+    Subsample(image_size, sample)
+    for sample in np.random.choice(training_samples, batch_size)
+  ]
+  images = (img for images in (
+    (sample.load_image() for sample in subsamples),
+    (sample.load_mask() for sample in subsamples),
+  ) for img in images)
+
   return send_file(
-    io.BufferedReader(SampleReader(batch_size, image_size)),
+    io.BufferedReader(SampleReader(images)),
+    attachment_filename='batch.raw',
+    mimetype='application/octet-stream',
+  )
+
+@app.route('/evaluation_batch')
+def evaluation_batch():
+  images = (sample.load_image() for sample in evaluation_samples)
+  return send_file(
+    io.BufferedReader(SampleReader(images)),
     attachment_filename='batch.raw',
     mimetype='application/octet-stream',
   )
