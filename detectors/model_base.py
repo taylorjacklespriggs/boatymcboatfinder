@@ -14,5 +14,5 @@ class ModelBase(object):
     _, loss = session.run([self.optimizer, self.loss], feed_dict={x: x_train, y: y_train})
     return loss
 
-  def forward(self, x_data):
+  def forward(self, session, x_data):
     return session.run(self.model, feed_dict={x: x_data})
