@@ -14,12 +14,12 @@ def evaluate_model(session, model, evaluation_data):
   for i in range(0, len(x_eval), count):
       end = min(i + count, len(x_eval))
       spliced = x_eval[i:end], y_eval[i:end]
-      loss, error = model.evaluate(session, spliced)
-      loss_total += loss
-      error_total += error
+      blank, boat = model.evaluate(session, spliced)
+      blank_total += blank
+      boat_total += boat
       n += 1
-      print('average loss', loss_total / n, 'error', error_total / n)
-  return loss_total / n, error_total / n
+      print('average blank', blank_total / n, 'boats', boats_total / n)
+  return blank_total / n, boats_total / n
 
 def train_and_evaluate(model_gen):
   import galileo_io
@@ -50,8 +50,9 @@ def train_and_evaluate(model_gen):
     galileo_io.log_metadata('average_load_time', load_time / batches)
     galileo_io.log_metadata('average_batch_time', batch_time / batches)
     start_eval = time.time()
-    loss, error = evaluate_model(sess, model, evaluation_data)
+    blank_loss, boat_loss = evaluate_model(sess, model, evaluation_data)
     galileo_io.log_metric('negative_eval_time', start_eval - time.time())
-    print('final loss', loss, 'error', error)
-    galileo_io.log_metric('negative_log_loss', -math.log(loss))
-    galileo_io.log_metric('negative_log_error', -math.log(error))
+    print('final blank', blank_loss, 'boats', boats_loss)
+    galileo_io.log_metadata('blank_loss', blank_loss)
+    galileo_io.log_metadata('boat_loss', boat_loss)
+    galileo_io.log_metric('negative_log_loss', -math.log(blank_loss + boat_loss))
