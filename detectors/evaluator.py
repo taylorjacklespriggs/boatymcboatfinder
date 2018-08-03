@@ -5,8 +5,6 @@ import time
 from data_loader import TrainingDataLoader
 from constants import assignments, x, y
 
-import galileo_io
-
 def evaluate_model(model, evaluation_data):
   count = 10
   x_eval, y_eval = evaluation_data
@@ -24,6 +22,8 @@ def evaluate_model(model, evaluation_data):
   return loss_total / n, error_total / n
 
 def train_and_evaluate(model_gen):
+  import galileo_io
+
   server = 'ec2-54-245-11-96.us-west-2.compute.amazonaws.com:5000'
   training_loader = TrainingDataLoader(
     server,
