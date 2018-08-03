@@ -12,16 +12,18 @@ def read_batch(fp):
   return x, y
 
 class TrainingDataLoader(object):
-  def __init__(self, server, batch_size, image_size):
+  def __init__(self, server, batch_size, image_size, blank_prob):
     self.server = server
     self.batch_size = batch_size
     self.image_size = image_size
+    self.blank_prob = blank_prob
 
   def get_train_url(self):
-    return 'http://{}/train_batch?batch_size={}&image_size={}'.format(
+    return 'http://{}/train_batch?batch_size={}&image_size={}&blank_prob={}'.format(
       self.server,
       self.batch_size,
       self.image_size,
+      self.blank_prob,
     )
 
   def load_batch(self):

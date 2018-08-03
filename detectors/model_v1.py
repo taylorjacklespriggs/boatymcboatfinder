@@ -22,3 +22,7 @@ class ModelV1(ModelBase):
     conv2 = activation_functions[assignments.get('conv2_act', 'sigmoid')](conv2)
 
     return conv2
+
+if __name__ == '__main__':
+  from evaluator import train_and_evaluate
+  train_and_evaluate(ModelV1)

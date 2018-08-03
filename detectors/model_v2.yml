@@ -4,7 +4,7 @@ resources_per_model:
 framework: tensorflow
 language: python3.6
 run:
-  -  python evaluator.py
+  -  python model_v2.py
 optimization:
   metrics:
     - name: negative_log_loss
@@ -75,4 +75,4 @@ aws:
   aws_access_key_id:
   aws_secret_access_key:
   ecr:
-    repository: galileo/tensorflow-mnist
+    repository: galileo/bmbf-v1

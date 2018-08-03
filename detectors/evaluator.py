@@ -2,33 +2,56 @@ import math
 import tensorflow as tf
 import time
 
-from model_v1 import ModelV1
 from data_loader import TrainingDataLoader
 from constants import assignments, x, y
 
 import galileo_io
 
-if __name__ == '__main__':
+def evaluate_model(model, evaluation_data):
+  count = 10
+  x_eval, y_eval = evaluation_data
+  n = 0
+  loss_total = 0.
+  error_total = 0.
+  for i in range(0, len(x_eval), count):
+      end = min(i + count, len(x_eval))
+      spliced = x_eval[i:end], y_eval[i:end]
+      loss, error += model.evaluate(sess, spliced)
+      loss_total += loss
+      error_total += error
+      n += 1
+      print('average loss', loss_total / n, 'error', error_total / n)
+  return loss_total / n, error_total / n
+
+def train_and_evaluate(model_gen):
   server = 'ec2-54-245-11-96.us-west-2.compute.amazonaws.com:5000'
   training_loader = TrainingDataLoader(
     server,
     batch_size=assignments['batch_size'],
     image_size=assignments['image_size'],
+    blank_prob=assignments['blank_prob'],
   )
-  x_eval, y_eval = load_evaluation_data(server)
+  evaluation_data = load_evaluation_data(server)
   with tf.Session() as sess:
-    model = ModelV1()
+    model = model_gen()
     sess.run(tf.global_variables_initializer())
     start_train = time.time()
-    for _ in range(assignments['batches']):
+    load_time = 0.
+    batch_time = 0.
+    batches = assignments['batches']
+    for _ in range(batches):
+      start_load = time.time()
       batch = training_loader.load_batch()
+      load_time += time.time() - start_load
+      start_batch = time.time()
       print(model.train_batch(sess, batch))
+      batch_time += time.time() - start_batch
     galileo_io.log_metric('negative_train_time', start_train - time.time())
+    galileo_io.log_metadata('average_load_time', load_time / batches)
+    galileo_io.log_metadata('average_batch_time', batch_time / batches)
     start_eval = time.time()
-    loss = sum(
-      model.evaluate(sess, (x_test.reshape((1, -1)), y_test.reshape((1, -1))))
-      for x_test, y_test in zip(x_eval, y_eval)
-    ) / len(x_eval)
+    loss, error = evaluate_model(model, evaluation_data)
     galileo_io.log_metric('negative_eval_time', start_eval - time.time())
-    print('final loss', loss)
+    print('final loss', loss, 'error', error)
     galileo_io.log_metric('negative_log_loss', -math.log(loss))
+    galileo_io.log_metric('negative_log_error', -math.log(error))

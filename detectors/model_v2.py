@@ -21,9 +21,9 @@ class ModelV2(ModelBase):
     for i in range(self.n_conv):
       in_tensor = create_conv_block(
           in_tensor=in_tensor,
-          kernel=assignments.get('conv{}_kernel'.format(i), 5),
-          output=assignments.get('conv{}_output'.format(i), 64),
-          activation=assignments.get('conv{}_act'.format(i), 'relu'),
+          kernel=assignments.get('conv_kernel'.format(i), 5),
+          output=assignments.get('conv_output'.format(i), 64),
+          activation=assignments.get('conv_act'.format(i), 'relu'),
       )
       in_tensor = tf.layers.batch_normalization(in_tensor, training=training_mode)
 
@@ -33,3 +33,7 @@ class ModelV2(ModelBase):
         output=1,
         activation=assignments.get('output_act', 'sigmoid'),
     )
+
+if __name__ == '__main__':
+  from evaluator import train_and_evaluate
+  train_and_evaluate(lambda: ModelV2(assignments['num_conv']))

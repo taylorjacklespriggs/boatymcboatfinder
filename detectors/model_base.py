@@ -9,6 +9,7 @@ class ModelBase(object):
     self.loss = tf.losses.mean_squared_error(y, self.model)
     self.optimizer = optimizer(learning_rate=10**assignments.get('log_learning_rate', -3))
     self.optimizer = self.optimizer.minimize(self.loss)
+    self.error_rate = tf.losses.mean_squared_error(y, (tf.sign(self.model - 0.5) + 1) * .5)
 
   def train_batch(self, session, batch):
     x_train, y_train = batch
@@ -27,6 +28,6 @@ class ModelBase(object):
   def evaluate(self, session, batch):
     x_train, y_train = batch
     return session.run(
-      self.loss,
+      [self.loss, self.error_rate],
       feed_dict={x: x_train, y: y_train, training_mode: False}
     )
