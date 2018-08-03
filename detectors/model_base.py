@@ -8,18 +8,17 @@ class ModelBase(object):
     self.model = self.create_model()
     self.loss = tf.losses.mean_squared_error(y, self.model)
     squared_diff = tf.square(y - self.model)
-    boat_detections = y * squared_diff
-    total_boat_pixels = tf.reduce_sum(y)
-    self.boat_loss = tf.cond(
-      total_boat_pixels == 0.,
-      true_fn=lambda: tf.reduce_sum(y * squared_diff),
-      false_fn=lambda: 0.,
-    )
     blank_pixels = 1. - y
     total_blank_pixels = tf.reduce_sum(blank_pixels)
     self.blank_loss = tf.cond(
-      total_blank_pixels == 0.,
-      true_fn=lambda: tf.reduce_sum(blank_pixels * squared_diff),
+      total_blank_pixels > 0.,
+      true_fn=lambda: tf.reduce_sum(blank_pixels * squared_diff) / total_blank_pixels,
+      false_fn=lambda: 0.,
+    )
+    total_boat_pixels = tf.reduce_sum(y)
+    self.boat_loss = tf.cond(
+      total_boat_pixels > 0.,
+      true_fn=lambda: tf.reduce_sum(y * squared_diff) / total_boat_pixels,
       false_fn=lambda: 0.,
     )
     self.loss = self.boat_loss + self.blank_loss
