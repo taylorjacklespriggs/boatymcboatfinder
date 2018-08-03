@@ -1,3 +1,4 @@
+from collections import defaultdict
 import numpy as np
 from PIL import Image
 
@@ -13,10 +14,12 @@ class Segmentation(object):
     return 'Segmentation(start={}, run={})'.format(self.start, self.run)
 
 class Sample(object):
-  def __init__(self, line):
-    self.image, segmentation = line[:-1].split(',')
-    segmentation = list(map(int, segmentation.split(' '))) if segmentation else []
-    self.segmentations = [Segmentation(start_px, run) for start_px, run in zip(segmentation[::2], segmentation[1::2])]
+  def __init__(self, image, segmentation):
+    self.image = image
+    self.segmentations = [
+      Segmentation(start_px, run)
+      for start_px, run in zip(segmentation[::2], segmentation[1::2])
+    ]
 
   def load_image(self):
     pil_image = Image.open('train/{}'.format(self.image))
@@ -35,7 +38,13 @@ def load_samples(filename='train_ship_segmentations.csv'):
   with open(filename) as segmentations_fp:
     # skip the header line
     next(segmentations_fp)
-    all_samples = [Sample(line) for line in segmentations_fp]
+    segmentations = defaultdict(list)
+    for line in segmentations_fp:
+      image, segmentation = line[:-1].split(',')
+      segmentations[image].extend(
+        list(map(int, segmentation.split(' '))) if segmentation else []
+      )
+    all_samples = [Sample(image, seg) for image, seg in segmentations.items()]
     return (
       [sample for sample in all_samples if not sample.segmentations],
       [sample for sample in all_samples if sample.segmentations],

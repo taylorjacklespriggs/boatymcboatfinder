@@ -1,15 +1,22 @@
 from flask import Flask, request, send_file
 import io
 import numpy as np
+import random
 
 from sample_loader import load_samples
 
+cv_parts = 100
+
 app = Flask(__name__)
 app.debug = True
-samples = load_samples()
-split = len(samples) // 100
-print(split)
-evaluation_samples, training_samples = samples[:split], samples[split:]
+blank_samples, boat_samples = load_samples()
+blank_split = len(blank_samples) // cv_parts
+boat_split = len(boat_samples) // cv_parts
+evaluation_samples, blank_training_samples, boat_training_samples = (
+  blank_samples[:blank_split] + boat_samples[:boat_split],
+  blank_samples[blank_split:],
+  boat_samples[boat_split:],
+)
 
 full_image_size = 768
 
@@ -23,10 +30,13 @@ class Subsample(object):
   def __init__(self, image_size, sample):
     self.sample = sample
     self.image_size = image_size
-    center_index = np.random.choice(np.concatenate(tuple(
-      np.arange(segment.start, segment.start+segment.run)
-      for segment in sample.segmentations
-    )))
+    if sample.segmentations:
+      center_index = np.random.choice(np.concatenate(tuple(
+        np.arange(segment.start, segment.start+segment.run)
+        for segment in sample.segmentations
+      )))
+    else:
+      center_index = random.randint(0, full_image_size**2-1)
     center_index = center_index // full_image_size, center_index % full_image_size
     (self.i_min, self.i_max), (self.j_min, self.j_max) = map(self._get_boundaries, center_index)
 
@@ -80,6 +90,15 @@ class ImageReader(object):
   def flush(self):
     pass
 
+def get_training_samples_with_blanks(batch_size, blank_prob):
+  all_training = blank_training_samples + boat_training_samples
+  p = np.zeros((len(all_training),), dtype=np.float32)
+  n_blank = len(blank_training_samples)
+  p[:n_blank] = blank_prob / n_blank
+  n_boat = len(boat_training_samples)
+  p[n_blank:] = (1. - blank_prob) / n_boat
+  return np.random.choice(all_training, batch_size, p=p)
+
 @app.route('/train_batch')
 def train_batch():
   batch_size = int(request.args.get('batch_size', '1'))
@@ -88,7 +107,7 @@ def train_batch():
 
   subsamples = [
     Subsample(image_size, sample)
-    for sample in np.random.choice(training_samples, batch_size)
+    for sample in get_training_samples_with_blanks(batch_size, blank_prob)
   ]
   images = (img for images in (
     (sample.load_image() for sample in subsamples),
