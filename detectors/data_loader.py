@@ -17,9 +17,9 @@ class TrainingDataLoader(object):
 
   def load_train_batch(self):
     with urlopen(self.get_train_url()) as train_fp:
-      x = np.frombuffer(train_fp.read(self.batch_pixels * 3), dtype=np.int8)
+      x = np.frombuffer(train_fp.read(self.batch_pixels * 3), dtype=np.uint8)
       x = x.reshape((self.batch_size, self.image_size, self.image_size, 3)).astype(np.float32)
       x /= 255
-      y = np.frombuffer(train_fp.read(self.batch_pixels), dtype=np.int8)
+      y = np.frombuffer(train_fp.read(self.batch_pixels), dtype=np.uint8)
       y = y.reshape((self.batch_size, self.image_size, self.image_size, 1)).astype(np.float32)
       return x, y
