@@ -16,7 +16,7 @@ def evaluate_model(model, evaluation_data):
   for i in range(0, len(x_eval), count):
       end = min(i + count, len(x_eval))
       spliced = x_eval[i:end], y_eval[i:end]
-      loss, error += model.evaluate(sess, spliced)
+      loss, error = model.evaluate(sess, spliced)
       loss_total += loss
       error_total += error
       n += 1
