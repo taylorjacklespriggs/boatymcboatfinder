@@ -16,3 +16,7 @@ class ModelBase(object):
 
   def forward(self, session, x_data):
     return session.run(self.model, feed_dict={x: x_data})
+
+  def evaluate(self, session, batch):
+    x_train, y_train = batch
+    return session.run(self.loss, feed_dict={x: x_train, y: y_train})
