@@ -2,7 +2,7 @@ import math
 import tensorflow as tf
 import time
 
-from data_loader import TrainingDataLoader
+from data_loader import TrainingDataLoader, load_evaluation_data
 from constants import assignments, x, y
 
 def evaluate_model(session, model, evaluation_data):

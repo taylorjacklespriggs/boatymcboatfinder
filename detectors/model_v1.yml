@@ -57,6 +57,11 @@ optimization:
       bounds:
         min: 1
         max: 100
+    - name: blank_prob
+      type: double
+      bounds:
+        min: 0
+        max: 1
     - name: batches
       type: int
       bounds:
@@ -65,7 +70,7 @@ optimization:
     - name: image_size
       type: int
       bounds:
-        min: 13
+        min: 10
         max: 768
   parallel_bandwidth: 4
   observation_budget: 200

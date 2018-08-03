@@ -1,4 +1,4 @@
-name: Boaty McBoatfinder V1
+name: Boaty McBoatfinder V2
 resources_per_model:
   gpus: 1
 framework: tensorflow
@@ -9,33 +9,33 @@ optimization:
   metrics:
     - name: negative_log_loss
   parameters:  # Fill in parameters to optimize
-    - name: conv1_kernel
+    - name: num_conv
+      type: int
+      bounds:
+        min: 0
+        max: 6
+    - name: conv_kernel
       type: int
       bounds:
         min: 2
-        max: 7
-    - name: conv1_output
+        max: 9
+    - name: conv_output
       type: int
       bounds:
         min: 2
-        max: 128
-    - name: conv1_act
+        max: 256
+    - name: conv_act
       type: categorical
       categorical_values:
         - relu
         - sigmoid
         - tanh
-    - name: conv2_kernel
+    - name: output_kernel
       type: int
       bounds:
         min: 2
-        max: 7
-    - name: conv2_output
-      type: int
-      bounds:
-        min: 2
-        max: 128
-    - name: conv2_act
+        max: 9
+    - name: output_act
       type: categorical
       categorical_values:
         - relu
@@ -57,15 +57,20 @@ optimization:
       bounds:
         min: 1
         max: 100
+    - name: blank_prob
+      type: double
+      bounds:
+        min: 0
+        max: 1
     - name: batches
       type: int
       bounds:
         min: 1
-        max: 100
+        max: 1000
     - name: image_size
       type: int
       bounds:
-        min: 13
+        min: 10
         max: 768
   parallel_bandwidth: 4
   observation_budget: 200
@@ -75,4 +80,4 @@ aws:
   aws_access_key_id:
   aws_secret_access_key:
   ecr:
-    repository: galileo/bmbf-v1
+    repository: galileo/bmbf-v2
