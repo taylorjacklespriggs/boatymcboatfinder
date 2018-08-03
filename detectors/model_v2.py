@@ -11,12 +11,14 @@ def create_conv_block(in_tensor, kernel, output, activation):
     conv_w_bias = tf.add(conv, b_c)
     return activation_functions[activation](conv_w_bias)
 
-n_blocks = 4
-
 class ModelV2(ModelBase):
+  def __init__(self, n_conv):
+    self.n_conv = n_conv
+    super().__init__()
+
   def create_model(self):
     in_tensor = x
-    for i in range(n_blocks):
+    for i in range(self.n_conv):
       in_tensor = create_conv_block(
           in_tensor=in_tensor,
           kernel=assignments.get('conv{}_kernel'.format(i), 5),
