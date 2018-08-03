@@ -8,8 +8,8 @@ assignments = {
 
 image_size = assignments['image_size']
 
-x = tf.placeholder("float", [None, image_size, image_size, 3])
-y = tf.placeholder("float", [None, image_size, image_size, 1])
+x = tf.placeholder("float", [None, None, None, 3])
+y = tf.placeholder("float", [None, None, None, 1])
 
 activation_functions = {
   'relu': tf.nn.relu,
