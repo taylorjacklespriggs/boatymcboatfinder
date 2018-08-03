@@ -5,7 +5,7 @@ import time
 from data_loader import TrainingDataLoader
 from constants import assignments, x, y
 
-def evaluate_model(model, evaluation_data):
+def evaluate_model(session, model, evaluation_data):
   count = 10
   x_eval, y_eval = evaluation_data
   n = 0
@@ -14,7 +14,7 @@ def evaluate_model(model, evaluation_data):
   for i in range(0, len(x_eval), count):
       end = min(i + count, len(x_eval))
       spliced = x_eval[i:end], y_eval[i:end]
-      loss, error = model.evaluate(sess, spliced)
+      loss, error = model.evaluate(session, spliced)
       loss_total += loss
       error_total += error
       n += 1
@@ -50,7 +50,7 @@ def train_and_evaluate(model_gen):
     galileo_io.log_metadata('average_load_time', load_time / batches)
     galileo_io.log_metadata('average_batch_time', batch_time / batches)
     start_eval = time.time()
-    loss, error = evaluate_model(model, evaluation_data)
+    loss, error = evaluate_model(sess, model, evaluation_data)
     galileo_io.log_metric('negative_eval_time', start_eval - time.time())
     print('final loss', loss, 'error', error)
     galileo_io.log_metric('negative_log_loss', -math.log(loss))
