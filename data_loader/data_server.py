@@ -2,7 +2,7 @@ from flask import Flask, request, send_file
 import io
 import numpy as np
 
-from data_loader import load_samples
+from sample_loader import load_samples
 
 app = Flask(__name__)
 app.debug = True
@@ -84,6 +84,7 @@ class ImageReader(object):
 def train_batch():
   batch_size = int(request.args.get('batch_size', '1'))
   image_size = int(request.args.get('image_size', '768'))
+  blank_prob = float(request.args.get('blank_prob', '0.8'))
 
   subsamples = [
     Subsample(image_size, sample)
