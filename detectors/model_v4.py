@@ -43,14 +43,10 @@ def create_inception_block(in_tensor):
     )
 
 class ModelV4(ModelBase):
-  def __init__(self, n_conv):
-    self.n_conv = n_conv
-    super().__init__()
-
   def create_model(self):
     in_tensor = x
     intermediate_layers = [x]
-    for i in range(self.n_conv):
+    for i in range(assignments['num_conv']):
       in_tensor = create_inception_block(in_tensor=in_tensor)
       in_tensor = tf.layers.batch_normalization(in_tensor, training=training_mode)
       intermediate_layers.append(in_tensor)
@@ -64,4 +60,4 @@ class ModelV4(ModelBase):
 
 if __name__ == '__main__':
   from evaluator import train_and_evaluate
-  train_and_evaluate(lambda: ModelV3(assignments['num_conv']))
+  train_and_evaluate(ModelV4)
