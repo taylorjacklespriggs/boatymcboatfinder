@@ -6,19 +6,20 @@ from constants import assignments, optimizer, x, y, training_mode
 class ModelBase(object):
   def __init__(self):
     self.model = self.create_model()
-    self.loss = tf.losses.mean_squared_error(y, self.model)
     squared_diff = tf.square(y - self.model)
     blank_pixels = 1. - y
-    total_blank_pixels = tf.reduce_sum(blank_pixels)
+    self.total_blank = tf.reduce_sum(blank_pixels)
+    self.error_blank = tf.reduce_sum(blank_pixels * squared_diff)
     self.blank_loss = tf.cond(
-      total_blank_pixels > 0.,
-      true_fn=lambda: tf.reduce_sum(blank_pixels * squared_diff) / total_blank_pixels,
+      self.total_blank > 0.,
+      true_fn=lambda: self.error_blank / self.total_blank,
       false_fn=lambda: 0.,
     )
-    total_boat_pixels = tf.reduce_sum(y)
+    self.total_boat = tf.reduce_sum(y)
+    self.error_boat = tf.reduce_sum(y * squared_diff)
     self.boat_loss = tf.cond(
-      total_boat_pixels > 0.,
-      true_fn=lambda: tf.reduce_sum(y * squared_diff) / total_boat_pixels,
+      self.total_boat > 0.,
+      true_fn=lambda: self.error_boat / self.total_boat,
       false_fn=lambda: 0.,
     )
     self.loss = self.boat_loss + self.blank_loss
@@ -44,6 +45,6 @@ class ModelBase(object):
   def evaluate(self, session, batch):
     x_train, y_train = batch
     return session.run(
-      [self.blank_loss, self.boat_loss],
+      [self.error_blank, self.total_blank, self.error_boat, self.total_boat],
       feed_dict={x: x_train, y: y_train, training_mode: False}
     )
