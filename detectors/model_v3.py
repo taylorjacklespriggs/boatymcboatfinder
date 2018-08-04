@@ -43,10 +43,6 @@ def create_inception_block(in_tensor):
     )
 
 class ModelV3(ModelBase):
-  def __init__(self, n_conv):
-    self.n_conv = n_conv
-    super().__init__()
-
   def create_model(self):
     in_tensor = x
     for i in range(assignments['num_conv']):

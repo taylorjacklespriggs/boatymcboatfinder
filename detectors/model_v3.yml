@@ -4,7 +4,7 @@ resources_per_model:
 framework: tensorflow
 language: python3.6
 run:
-  -  python model_v2.py
+  -  python model_v3.py
 optimization:
   metrics:
     - name: negative_log_loss
@@ -70,7 +70,7 @@ optimization:
       type: int
       bounds:
         min: 1
-        max: 100
+        max: 10
     - name: blank_prob
       type: double
       bounds:

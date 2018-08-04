@@ -50,7 +50,7 @@ optimization:
       type: int
       bounds:
         min: 1
-        max: 100
+        max: 10
     - name: blank_prob
       type: double
       bounds:
