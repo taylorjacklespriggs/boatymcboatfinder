@@ -22,7 +22,7 @@ class ModelBase(object):
 
   def train_batch(self, session, batch):
     x_train, y_train = batch
-    return = session.run(
+    return session.run(
       [self.optimizer, self.loss],
       feed_dict={x: x_train, y: y_train, training_mode: True}
     )[1]
