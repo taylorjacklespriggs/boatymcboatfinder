@@ -13,7 +13,7 @@ class ModelBase(object):
     self.loss = tf.cond(
       self.union > 0.,
       true_fn=lambda: 1. - self.iou,
-      false_fn=lambda: self.model,
+      false_fn=lambda: tf.reduce_mean(self.model),
     )
     self.optimizer = optimizer(
       learning_rate=10**assignments.get('log_learning_rate', -3)
