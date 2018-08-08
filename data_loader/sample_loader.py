@@ -22,8 +22,13 @@ class Sample(object):
     ]
 
   def load_image(self):
-    pil_image = Image.open('train/{}'.format(self.image))
-    pil_image.load()
+    image_name = 'train/{}'.format(self.image)
+    pil_image = Image.open(image_name)
+    try:
+      pil_image.load()
+    except Exception:
+      print(image_name)
+      raise
     flat_data = np.asarray(pil_image, dtype=np.int32).astype(np.uint8)
     return flat_data.transpose((1, 0, 2)).copy()
 
