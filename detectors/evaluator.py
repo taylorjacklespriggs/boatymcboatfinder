@@ -35,13 +35,18 @@ def train_and_evaluate(model_gen):
     load_time = 0.
     batch_time = 0.
     batches = assignments['batches']
-    for _ in range(batches):
+    for i in range(batches):
+      print('batch', i + 1, 'of', batches)
       start_load = time.time()
       batch = training_loader.load_batch()
-      load_time += time.time() - start_load
+      t = time.time() - start_load
+      print('seconds to load batch', t)
+      load_time += t
       start_batch = time.time()
       print(model.train_batch(sess, batch))
-      batch_time += time.time() - start_batch
+      t = time.time() - start_batch
+      print('seconds to train batch', t)
+      batch_time += t
     galileo.io.log_metric('negative_train_time', start_train - time.time())
     galileo.io.log_metadata('average_load_time', load_time / batches)
     galileo.io.log_metadata('average_batch_time', batch_time / batches)
