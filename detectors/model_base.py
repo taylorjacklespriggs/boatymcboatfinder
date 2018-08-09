@@ -32,7 +32,7 @@ class ModelBase(object):
         x: x_train,
         y: y_train,
         training_mode: True,
-        learning_rate=10**assignments.get('log_learning_rate', -3),
+        learning_rate: 10**assignments.get('log_learning_rate', -3),
       }
     )[1]
 
