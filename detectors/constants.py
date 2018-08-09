@@ -11,6 +11,7 @@ image_size = assignments.setdefault('image_size', 768)
 x = tf.placeholder("float", [None, None, None, 4])
 y = tf.placeholder("float", [None, None, None, 1])
 training_mode = tf.placeholder("bool")
+learning_rate = tf.placeholder(tf.float64)
 
 activation_functions = {
   'relu': tf.nn.relu,
