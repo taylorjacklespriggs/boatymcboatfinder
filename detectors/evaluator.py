@@ -58,5 +58,4 @@ def train_and_evaluate(model_gen):
     galileo.io.log_metadata('intersection', float(intersection))
     galileo.io.log_metadata('union', float(union))
     iou = intersection / union
-    galileo.io.log_metadata('iou', float(iou))
-    galileo.io.log_metric('loss', 1. - iou)
+    galileo.io.log_metric('iou', iou)
