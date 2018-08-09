@@ -4,8 +4,10 @@ from urllib.request import urlopen
 def read_batch(fp):
   count, rows, cols = np.frombuffer(fp.read(12), dtype=np.uint32).astype(int)
   batch_pixels = count * rows * cols
-  x = np.frombuffer(fp.read(batch_pixels * 3), dtype=np.uint8)
-  x = x.reshape((count, rows, cols, 3)).astype(np.float64)
+  x_pixels = np.frombuffer(fp.read(batch_pixels * 3), dtype=np.uint8)
+  x_pixels = x_pixels.reshape((count, rows, cols, 3))
+  x = np.zeros((count, rows, cols, 4), dtype=np.float64)
+  x[:, :, :, :3] = x_pixels
   x /= 255
   y = np.frombuffer(fp.read(batch_pixels), dtype=np.uint8)
   y = y.reshape((count, rows, cols, 1)).astype(np.float64)

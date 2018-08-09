@@ -1,8 +1,8 @@
 import tensorflow as tf
 
 try:
-  import galileo_io
-  assignments = galileo_io.suggestion.assignments.copy()
+  import galileo.io
+  assignments = galileo.io.suggestion.assignments.copy()
 except ImportError:
   assignments = {}
 

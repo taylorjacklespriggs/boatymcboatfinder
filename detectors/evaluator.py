@@ -18,9 +18,9 @@ def evaluate_model(session, model, evaluation_data):
   return intersection, union
 
 def train_and_evaluate(model_gen):
-  import galileo_io
+  import galileo.io
 
-  server = 'ec2-54-245-11-96.us-west-2.compute.amazonaws.com:5000'
+  server = 'ec2-54-244-7-55.us-west-2.compute.amazonaws.com:5000'
   training_loader = TrainingDataLoader(
     server,
     batch_size=assignments['batch_size'],
@@ -42,16 +42,16 @@ def train_and_evaluate(model_gen):
       start_batch = time.time()
       print(model.train_batch(sess, batch))
       batch_time += time.time() - start_batch
-    galileo_io.log_metric('negative_train_time', start_train - time.time())
-    galileo_io.log_metadata('average_load_time', load_time / batches)
-    galileo_io.log_metadata('average_batch_time', batch_time / batches)
+    galileo.io.log_metric('negative_train_time', start_train - time.time())
+    galileo.io.log_metadata('average_load_time', load_time / batches)
+    galileo.io.log_metadata('average_batch_time', batch_time / batches)
     start_eval = time.time()
     intersection, union = evaluate_model(sess, model, evaluation_data)
-    galileo_io.log_metric('negative_eval_time', start_eval - time.time())
+    galileo.io.log_metric('negative_eval_time', start_eval - time.time())
     print('final intersection', intersection, 'union', union)
     print('iou', intersection / union)
-    galileo_io.log_metadata('intersection', intersection)
-    galileo_io.log_metadata('union', union)
+    galileo.io.log_metadata('intersection', intersection)
+    galileo.io.log_metadata('union', union)
     iou = intersection / union
-    galileo_io.log_metadata('iou', iou)
-    galileo_io.log_metric('loss', 1. - iou)
+    galileo.io.log_metadata('iou', iou)
+    galileo.io.log_metric('loss', 1. - iou)
