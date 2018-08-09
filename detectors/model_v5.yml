@@ -12,7 +12,7 @@ optimization:
     - name: num_conv
       type: int
       bounds:
-        min: 1
+        min: 0
         max: 6
     - name: conv_a1_features
       type: int
