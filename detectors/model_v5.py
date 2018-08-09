@@ -57,14 +57,14 @@ class ModelV5(ModelBase):
   def create_model(self):
     in_tensor = x
     intermediate_layers = [x]
-    for i in range(assignments['num_conv']):
+    for i in range(assignments.get('num_conv', 2)):
       in_tensor = create_inception_block(in_tensor=in_tensor)
       in_tensor = tf.layers.batch_normalization(in_tensor, training=training_mode)
       intermediate_layers.append(in_tensor)
 
     block_result = tf.concat(intermediate_layers, 3)
-    final_conv_1 = create_conv(block_result, assignments.get('out_conv_1_kernel', 11), assignments.get('out_conv_1_features', 100))
-    final_conv_2 = create_conv(final_conv_1, 1, assignments.get('out_conv_2_features', 100))
+    final_conv_1 = create_conv(block_result, assignments.get('out_conv1_kernel', 11), assignments.get('out_conv1_features', 100))
+    final_conv_2 = create_conv(final_conv_1, assignments.get('out_conv2_kernel', 1), assignments.get('out_conv2_features', 100))
     out_final = create_conv(
         in_tensor=final_conv_2,
         kernel=1,
