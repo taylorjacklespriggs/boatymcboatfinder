@@ -5,10 +5,10 @@ def read_batch(fp):
   count, rows, cols = np.frombuffer(fp.read(12), dtype=np.uint32).astype(int)
   batch_pixels = count * rows * cols
   x = np.frombuffer(fp.read(batch_pixels * 3), dtype=np.uint8)
-  x = x.reshape((count, rows, cols, 3)).astype(np.float32)
+  x = x.reshape((count, rows, cols, 3)).astype(np.float64)
   x /= 255
   y = np.frombuffer(fp.read(batch_pixels), dtype=np.uint8)
-  y = y.reshape((count, rows, cols, 1)).astype(np.float32)
+  y = y.reshape((count, rows, cols, 1)).astype(np.float64)
   return x, y
 
 class TrainingDataLoader(object):

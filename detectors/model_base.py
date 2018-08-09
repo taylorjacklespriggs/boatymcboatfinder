@@ -36,6 +36,6 @@ class ModelBase(object):
   def evaluate(self, session, batch):
     x_train, y_train = batch
     return session.run(
-      [self.intersection, self.union],
+      [self.intersection, self.union, self.loss],
       feed_dict={x: x_train, y: y_train, training_mode: False}
     )

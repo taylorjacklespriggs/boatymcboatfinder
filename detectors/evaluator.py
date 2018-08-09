@@ -6,16 +6,15 @@ from data_loader import TrainingDataLoader, load_evaluation_data
 from constants import assignments, x, y
 
 def evaluate_model(session, model, evaluation_data):
-  count = 10
+  count = 1
   x_eval, y_eval = evaluation_data
   total_intersection, total_union = 0., 0.
   for i in range(0, len(x_eval), count):
       end = min(i + count, len(x_eval))
       spliced = x_eval[i:end], y_eval[i:end]
-      intersection, union = model.evaluate(session, spliced)
+      intersection, union, _ = model.evaluate(session, spliced)
       total_intersection += intersection
       total_union += union
-      print('intersection', intersection, 'and union', union)
   return intersection, union
 
 def train_and_evaluate(model_gen):

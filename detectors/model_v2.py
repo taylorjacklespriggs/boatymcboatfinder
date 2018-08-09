@@ -12,13 +12,9 @@ def create_conv_block(in_tensor, kernel, output, activation):
     return activation_functions[activation](conv_w_bias)
 
 class ModelV2(ModelBase):
-  def __init__(self, n_conv):
-    self.n_conv = n_conv
-    super().__init__()
-
   def create_model(self):
     in_tensor = x
-    for i in range(self.n_conv):
+    for i in range(assignments.get('n_conv', 2)):
       in_tensor = create_conv_block(
           in_tensor=in_tensor,
           kernel=assignments.get('conv_kernel'.format(i), 5),
@@ -36,4 +32,4 @@ class ModelV2(ModelBase):
 
 if __name__ == '__main__':
   from evaluator import train_and_evaluate
-  train_and_evaluate(lambda: ModelV2(assignments['num_conv']))
+  train_and_evaluate(ModelV2)
