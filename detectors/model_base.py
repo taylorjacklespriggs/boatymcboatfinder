@@ -10,11 +10,11 @@ class ModelBase(object):
     self.intersection = tf.reduce_sum(self.masked_output)
     self.union = tf.reduce_sum(y + self.model - self.masked_output)
     self.iou = self.intersection / self.union
-    self.loss = tf.cond(
+    self.loss = -tf.log(tf.cond(
       self.union > 0.,
-      true_fn=lambda: 1. - self.iou,
+      true_fn=lambda: self.iou,
       false_fn=lambda: tf.reduce_mean(self.model),
-    )
+    ))
     self.optimizer = optimizer(
       learning_rate=10**assignments.get('log_learning_rate', -3)
     )
