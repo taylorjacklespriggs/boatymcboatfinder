@@ -1,0 +1,100 @@
+name: Boaty McBoatfinder V5
+resources_per_model:
+  gpus: 1
+framework: tensorflow
+language: python3.6
+run:
+  -  python model_v5.py
+optimization:
+  metrics:
+    - name: iou
+  parameters:  # Fill in parameters to optimize
+    - name: num_conv
+      type: int
+      bounds:
+        min: 1
+        max: 4
+    - name: conv_a1_features
+      type: int
+      bounds:
+        min: 1
+        max: 32
+    - name: conv_b1_features
+      type: int
+      bounds:
+        min: 1
+        max: 32
+    - name: conv_b2_features
+      type: int
+      bounds:
+        min: 1
+        max: 32
+    - name: conv_c1_features
+      type: int
+      bounds:
+        min: 1
+        max: 32
+    - name: conv_c2_features
+      type: int
+      bounds:
+        min: 1
+        max: 32
+    - name: conv_d2_features
+      type: int
+      bounds:
+        min: 1
+        max: 32
+    - name: out_conv1_kernel
+      type: int
+      bounds:
+        min: 1
+        max: 20
+    - name: out_conv1_features
+      type: int
+      bounds:
+        min: 2
+        max: 1000
+    - name: out_conv2_kernel
+      type: int
+      bounds:
+        min: 1
+        max: 20
+    - name: out_conv2_features
+      type: int
+      bounds:
+        min: 2
+        max: 1000
+    - name: log_learning_rate
+      type: double
+      bounds:
+        min: -8
+        max: -2
+    - name: batch_size
+      type: int
+      bounds:
+        min: 1
+        max: 20
+    - name: blank_prob
+      type: double
+      bounds:
+        min: 0
+        max: 1
+    - name: batches
+      type: int
+      bounds:
+        min: 10
+        max: 1000
+    - name: image_size
+      type: int
+      bounds:
+        min: 50
+        max: 400
+  parallel_bandwidth: 4
+  observation_budget: 1000
+aws:
+  # Region and access key are not needed if the user has configured their AWS CLI locally
+  region:
+  aws_access_key_id:
+  aws_secret_access_key:
+  ecr:
+    repository: galileo/bmbf-v5
