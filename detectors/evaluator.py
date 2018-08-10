@@ -34,8 +34,23 @@ def train_and_evaluate(model_gen):
     start_train = time.time()
     load_time = 0.
     batch_time = 0.
+    remaining_time = 20 * 60
+    max_batch_time = 0
+
+    def log_all_meta(batch_num=batches):
+      galileo.io.log_metadata('average_load_time', load_time / batches)
+      galileo.io.log_metadata('average_batch_time', batch_time / batches)
+      galileo.io.log_metadata('remaining_time', remaining_time)
+      galileo.io.log_metadata('max_batch_time', max_batch_time)
+      galileo.io.log_metadata('remaining_batches', batches - batch_num)
+
     batches = assignments['batches']
     for i in range(batches):
+      if remaining_time < max_batch_time * (batches - i):
+        log_all_meta(i)
+        galileo.io.log_metadata('failure_reason', 'time')
+        raise Exception("Training might exceed alotted time")
+      print('remaining time for training', remaining_time)
       print('batch', i + 1, 'of', batches)
       start_load = time.time()
       batch = training_loader.load_batch()
@@ -43,16 +58,22 @@ def train_and_evaluate(model_gen):
       print('seconds to load batch', t)
       load_time += t
       start_batch = time.time()
-      print(model.train_batch(sess, batch))
+      try:
+        print(model.train_batch(sess, batch))
+      except Exception:
+        log_all_meta(i)
+        galileo.io.log_metadata('failure_reason', 'memory')
+        raise
       t = time.time() - start_batch
       print('seconds to train batch', t)
       batch_time += t
-    galileo.io.log_metric('negative_train_time', start_train - time.time())
-    galileo.io.log_metadata('average_load_time', load_time / batches)
-    galileo.io.log_metadata('average_batch_time', batch_time / batches)
+      max_batch_time = max(batch_time, t)
+      remaining_time -= t
+    galileo.io.log_metadata('train_time', time.time() - start_train)
+    log_all_meta()
     start_eval = time.time()
     intersection, union = evaluate_model(sess, model, evaluation_data)
-    galileo.io.log_metric('negative_eval_time', start_eval - time.time())
+    galileo.io.log_metadata('eval_time', time.time() - start_eval)
     print('final intersection', intersection, 'union', union)
     print('iou', intersection / union)
     galileo.io.log_metadata('intersection', float(intersection))
