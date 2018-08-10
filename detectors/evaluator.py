@@ -42,6 +42,7 @@ def train_and_evaluate(model_gen):
       galileo.io.log_metadata('average_batch_time', batch_time / batches)
       galileo.io.log_metadata('remaining_time', remaining_time)
       galileo.io.log_metadata('remaining_batches', batches - batch_num)
+      galileo.io.log_metadata('completion_fraction', batch_num / batches)
 
     for i in range(batches):
       if remaining_time * i < batch_time * (batches - i):
