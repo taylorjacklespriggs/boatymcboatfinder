@@ -6,11 +6,11 @@ def read_batch(fp):
   batch_pixels = count * rows * cols
   x_pixels = np.frombuffer(fp.read(batch_pixels * 3), dtype=np.uint8)
   x_pixels = x_pixels.reshape((count, rows, cols, 3))
-  x = np.zeros((count, rows, cols, 4), dtype=np.float64)
+  x = np.zeros((count, rows, cols, 4), dtype=np.float32)
   x[:, :, :, :3] = x_pixels
   x /= 255
   y = np.frombuffer(fp.read(batch_pixels), dtype=np.uint8)
-  y = y.reshape((count, rows, cols, 1)).astype(np.float64)
+  y = y.reshape((count, rows, cols, 1)).astype(np.float32)
   return x, y
 
 class TrainingDataLoader(object):

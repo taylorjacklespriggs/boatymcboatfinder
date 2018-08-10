@@ -7,11 +7,11 @@ def create_conv(in_tensor, kernel, out_features, activation='relu'):
   in_features = in_tensor.get_shape()[3].value
   w_c = tf.Variable(tf.random_normal(
     [kernel, kernel, in_features, out_features],
-    dtype=tf.float64,
+    dtype=tf.float32,
   ))
   b_c = tf.Variable(tf.random_normal(
     [out_features],
-    dtype=tf.float64,
+    dtype=tf.float32,
   ))
   conv = tf.nn.conv2d(in_tensor, w_c, strides=[1, 1, 1, 1], padding='SAME')
   conv_w_bias = tf.add(conv, b_c)

@@ -11,13 +11,13 @@ class ModelBase(object):
     log_intersection = tf.cond(
       self.intersection > 0.,
       true_fn=lambda: tf.log(self.intersection),
-      false_fn=lambda: tf.constant(0., dtype=tf.float64),
+      false_fn=lambda: tf.constant(0., dtype=tf.float32),
     )
     self.union = tf.reduce_sum(y + self.model - self.masked_output)
     log_union = tf.cond(
       self.union > 0.,
       true_fn=lambda: tf.log(self.union),
-      false_fn=lambda: tf.constant(0., dtype=tf.float64),
+      false_fn=lambda: tf.constant(0., dtype=tf.float32),
     )
     self.iou = self.intersection / self.union
     self.loss = log_union - log_intersection
