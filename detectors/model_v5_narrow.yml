@@ -67,7 +67,7 @@ optimization:
     - name: log_learning_rate
       type: double
       bounds:
-        min: -8
+        min: -10
         max: -2
     - name: batch_size
       type: int

@@ -27,7 +27,6 @@ def train_and_evaluate(model_gen):
     image_size=assignments['image_size'],
     blank_prob=assignments['blank_prob'],
   )
-  evaluation_data = load_evaluation_data(server)
   with tf.Session() as sess:
     model = model_gen()
     sess.run(tf.global_variables_initializer())
@@ -38,8 +37,9 @@ def train_and_evaluate(model_gen):
     batches = assignments['batches']
 
     def log_all_meta(batch_num=batches):
-      galileo.io.log_metadata('average_load_time', load_time / batches)
-      galileo.io.log_metadata('average_batch_time', batch_time / batches)
+      if batch_num:
+        galileo.io.log_metadata('average_load_time', load_time / batch_num)
+        galileo.io.log_metadata('average_batch_time', batch_time / batch_num)
       galileo.io.log_metadata('remaining_time', remaining_time)
       galileo.io.log_metadata('remaining_batches', batches - batch_num)
       galileo.io.log_metadata('completion_fraction', batch_num / batches)
@@ -71,6 +71,7 @@ def train_and_evaluate(model_gen):
     galileo.io.log_metadata('train_time', time.time() - start_train)
     log_all_meta()
     start_eval = time.time()
+    evaluation_data = load_evaluation_data(server)
     intersection, union = evaluate_model(sess, model, evaluation_data)
     galileo.io.log_metadata('eval_time', time.time() - start_eval)
     print('final intersection', intersection, 'union', union)
