@@ -36,6 +36,7 @@ def train_and_evaluate(model_gen):
     batch_time = 0.
     remaining_time = 20 * 60
     max_batch_time = 0
+    batches = assignments['batches']
 
     def log_all_meta(batch_num=batches):
       galileo.io.log_metadata('average_load_time', load_time / batches)
@@ -44,7 +45,6 @@ def train_and_evaluate(model_gen):
       galileo.io.log_metadata('max_batch_time', max_batch_time)
       galileo.io.log_metadata('remaining_batches', batches - batch_num)
 
-    batches = assignments['batches']
     for i in range(batches):
       if remaining_time < max_batch_time * (batches - i):
         log_all_meta(i)
