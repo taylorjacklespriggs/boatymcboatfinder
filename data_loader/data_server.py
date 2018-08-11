@@ -5,7 +5,7 @@ import random
 
 from sample_loader import load_samples
 
-cv_parts = 100
+cv_parts = 20
 
 app = Flask(__name__)
 app.debug = True
