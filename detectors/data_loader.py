@@ -14,8 +14,9 @@ def read_batch(fp):
   return x, y
 
 class TrainingDataLoader(object):
-  def __init__(self, server, batch_size, image_size, blank_prob):
+  def __init__(self, server, multi_fetch, batch_size, image_size, blank_prob):
     self.server = server
+    self.multi_fetch = multi_fetch
     self.batch_size = batch_size
     self.image_size = image_size
     self.blank_prob = blank_prob
@@ -23,14 +24,18 @@ class TrainingDataLoader(object):
   def get_train_url(self):
     return 'http://{}/train_batch?batch_size={}&image_size={}&blank_prob={}'.format(
       self.server,
-      self.batch_size,
+      self.multi_fetch * self.batch_size,
       self.image_size,
       self.blank_prob,
     )
 
   def load_batch(self):
     with urlopen(self.get_train_url()) as train_fp:
-      return read_batch(train_fp)
+      x, y = read_batch(train_fp)
+      count, rows, cols, chan = x.shape
+      x = x.reshape((self.multi_fetch, count // self.multi_fetch, rows, cols, chan))
+      y = y.reshape((self.multi_fetch, count // self.multi_fetch, rows, cols, 1))
+      return list(zip(x, y))
 
 def load_evaluation_data(server):
   url = 'http://{}/evaluation_batch'.format(server)
