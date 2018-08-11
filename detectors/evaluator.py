@@ -33,24 +33,17 @@ def train_and_evaluate(model_gen):
     start_train = time.time()
     load_time = 0.
     batch_time = 0.
-    remaining_time = 20 * 60
-    batches = assignments['batches']
+    remaining_time = 60 * 60
+    batches = 0
 
-    def log_all_meta(batch_num=batches):
-      if batch_num:
-        galileo.io.log_metadata('average_load_time', load_time / batch_num)
-        galileo.io.log_metadata('average_batch_time', batch_time / batch_num)
+    def log_all_meta():
+      if batches:
+        galileo.io.log_metadata('average_load_time', load_time / batches)
+        galileo.io.log_metadata('average_batch_time', batch_time / batches)
       galileo.io.log_metadata('remaining_time', remaining_time)
-      galileo.io.log_metadata('remaining_batches', batches - batch_num)
-      galileo.io.log_metadata('completion_fraction', batch_num / batches)
 
-    for i in range(batches):
-      if remaining_time * i < batch_time * (batches - i):
-        log_all_meta(i)
-        galileo.io.log_metadata('failure_reason', 'time')
-        raise Exception("Training might exceed alotted time")
+    while remaining_time > 0:
       print('remaining time for training', remaining_time)
-      print('batch', i + 1, 'of', batches)
       start_load = time.time()
       batch = training_loader.load_batch()
       t = time.time() - start_load
@@ -66,8 +59,8 @@ def train_and_evaluate(model_gen):
       t = time.time() - start_batch
       print('seconds to train batch', t)
       batch_time += t
-      max_batch_time = max(batch_time, t)
-      remaining_time -= t
+      remaining_time -= time.time() - start_load
+      batches += 1
     galileo.io.log_metadata('train_time', time.time() - start_train)
     log_all_meta()
     start_eval = time.time()
