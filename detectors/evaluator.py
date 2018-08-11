@@ -53,13 +53,13 @@ def train_and_evaluate(model_gen):
       load_time += t
       start_batch = time.time()
       try:
-        for _ in multi_batch_epochs:
+        for _ in range(multi_batch_epochs):
           loss = 0
           for batch in multi_batch:
             loss += model.train_batch(sess, batch)
           print('avg loss', loss / len(multi_batch))
       except Exception:
-        log_all_meta(i)
+        log_all_meta()
         galileo.io.log_metadata('failure_reason', 'memory')
         raise
       t = time.time() - start_batch

@@ -69,6 +69,16 @@ optimization:
       bounds:
         min: -10
         max: -6.5
+    - name: multi_batch
+      type: int
+      bounds:
+        min: 10
+        max: 1000
+    - name: multi_batch_epochs
+      type: int
+      bounds:
+        min: 1
+        max: 100
     - name: batch_size
       type: int
       bounds:
