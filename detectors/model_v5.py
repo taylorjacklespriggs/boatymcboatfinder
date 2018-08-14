@@ -73,7 +73,7 @@ class ModelV5(ModelBase):
     final_conv_2 = create_conv(final_conv_1, assignments.get('out_conv2_kernel', 1), assignments.get('out_conv2_features', 100))
     out_final = create_conv(
         in_tensor=final_conv_2,
-        kernel=1,
+        kernel=assignments.get('activation_kernel', 1),
         out_features=1,
         activation='sigmoid',
     )

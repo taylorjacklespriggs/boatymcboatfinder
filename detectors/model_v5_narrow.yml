@@ -12,38 +12,38 @@ optimization:
     - name: num_conv
       type: int
       bounds:
-        min: 1
-        max: 5
+        min: 2
+        max: 8
     - name: conv_a1_features
       type: int
       bounds:
-        min: 26
-        max: 36
+        min: 8
+        max: 64
     - name: conv_b1_features
       type: int
       bounds:
-        min: 13
-        max: 18
+        min: 8
+        max: 64
     - name: conv_b2_features
       type: int
       bounds:
-        min: 16
-        max: 32
+        min: 8
+        max: 64
     - name: conv_c1_features
       type: int
       bounds:
-        min: 15
-        max: 25
+        min: 8
+        max: 64
     - name: conv_c2_features
       type: int
       bounds:
-        min: 27
-        max: 40
+        min: 8
+        max: 64
     - name: conv_d2_features
       type: int
       bounds:
-        min: 13
-        max: 32
+        min: 8
+        max: 64
     - name: out_conv1_kernel
       type: int
       bounds:
@@ -53,49 +53,49 @@ optimization:
       type: int
       bounds:
         min: 1
-        max: 100
+        max: 128
     - name: out_conv2_kernel
       type: int
       bounds:
         min: 1
-        max: 7
+        max: 14
     - name: out_conv2_features
       type: int
       bounds:
-        min: 550
-        max: 800
+        min: 32
+        max: 2048
+    - name: activation_kernel
+      type: int
+      bounds:
+        min: 1
+        max: 32
     - name: log_learning_rate
       type: double
       bounds:
-        min: -10
-        max: -6.5
+        min: -12
+        max: -7
     - name: multi_batch
       type: int
       bounds:
-        min: 10
-        max: 1000
+        min: 1
+        max: 512
     - name: multi_batch_epochs
       type: int
       bounds:
         min: 1
-        max: 100
+        max: 512
     - name: batch_size
       type: int
       bounds:
-        min: 5
-        max: 8
-    - name: blank_prob
-      type: double
-      bounds:
-        min: 0.15
-        max: 0.25
+        min: 1
+        max: 32
     - name: image_size
       type: int
       bounds:
-        min: 30
-        max: 85
-  parallel_bandwidth: 6
-  observation_budget: 1000
+        min: 32
+        max: 128
+  parallel_bandwidth: 2
+  observation_budget: 400
 aws:
   # Region and access key are not needed if the user has configured their AWS CLI locally
   region:
