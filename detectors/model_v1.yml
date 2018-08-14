@@ -7,7 +7,7 @@ run:
   -  python model_v1.py
 optimization:
   metrics:
-    - name: negative_log_loss
+    - name: iou
   parameters:  # Fill in parameters to optimize
     - name: conv1_kernel
       type: int
