@@ -13,37 +13,37 @@ optimization:
       type: int
       bounds:
         min: 1
-        max: 64
+        max: 32
     - name: conv1_output
       type: int
       bounds:
-        min: 1
-        max: 1024
+        min: 128
+        max: 512
     - name: conv2_kernel
       type: int
       bounds:
-        min: 1
+        min: 16
         max: 64
     - name: log_learning_rate
       type: double
       bounds:
-        min: -9
-        max: 0
+        min: -6
+        max: -3
     - name: batch_size
       type: int
       bounds:
         min: 1
-        max: 128
-    - name: blank_prob
-      type: double
-      bounds:
-        min: 0
-        max: 1
+        max: 64
     - name: image_size
       type: int
       bounds:
-        min: 16
+        min: 64
         max: 256
+    - name: training_minutes
+      type: double
+      bounds:
+        min: 1
+        max: 30
   parallel_bandwidth: 2
   observation_budget: 200
 aws:

@@ -19,6 +19,7 @@ def evaluate_model(session, model, evaluation_data):
 
 def train_and_evaluate(model_gen):
   import galileo.io
+  galileo.io.log_metadata('start_time', time.time())
 
   server = 'ec2-54-244-7-55.us-west-2.compute.amazonaws.com:5000'
   training_loader = TrainingDataLoader(
@@ -35,7 +36,7 @@ def train_and_evaluate(model_gen):
     start_train = time.time()
     load_time = 0.
     batch_time = 0.
-    remaining_time = 5 * 60
+    remaining_time = assignments.get('training_minutes', 5) * 60
     batches = 0
 
     def log_all_meta():
@@ -83,3 +84,4 @@ def train_and_evaluate(model_gen):
     galileo.io.log_metadata('union', float(union))
     iou = intersection / union
     galileo.io.log_metric('iou', iou)
+    galileo.io.log_metadata('finish_time', time.time())
