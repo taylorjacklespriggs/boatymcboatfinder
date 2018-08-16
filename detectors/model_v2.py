@@ -13,7 +13,7 @@ def create_conv_block(in_tensor, kernel, output, activation):
     ))
     conv = tf.nn.conv2d(in_tensor, w_c, strides=[1, 1, 1, 1], padding='SAME')
     bn_conv = tf.layers.batch_normalization(conv, training=training_mode)
-    return activation_functions[activation](bn_bias)
+    return activation_functions[activation](bn_conv)
 
 class ModelV2(ModelBase):
   def create_model(self):
