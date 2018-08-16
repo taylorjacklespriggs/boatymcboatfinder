@@ -22,9 +22,11 @@ evaluation_samples, blank_training_samples, boat_training_samples = (
 full_image_size = 768
 
 def load_mask(sample):
-  mask = np.zeros((full_image_size, full_image_size, 1), dtype=np.uint8)
-  sample.apply_segmentations(mask, 1)
-  return mask
+  def func():
+    mask = np.zeros((full_image_size, full_image_size, 1), dtype=np.uint8)
+    sample.apply_segmentations(mask, 1)
+    return mask
+  return func
 
 
 class Subsample(object):
@@ -54,7 +56,7 @@ class Subsample(object):
     return self._splice(self.sample.load_image())
 
   def load_mask(self):
-    return self._splice(load_mask(self.sample))
+    return self._splice(load_mask(self.sample)())
 
 
 class ImageReader(object):
@@ -129,7 +131,7 @@ def train_batch():
 def evaluation_batch():
   image_loaders = [img_loader for image_loaders in (
     (sample.load_image for sample in evaluation_samples),
-    ((lambda: load_mask(sample)) for sample in evaluation_samples),
+    (load_mask(sample) for sample in evaluation_samples),
   ) for img_loader in image_loaders]
   return send_file(
     io.BufferedReader(ImageReader((len(evaluation_samples), 768, 768), image_loaders)),
