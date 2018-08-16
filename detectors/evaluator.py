@@ -74,8 +74,7 @@ def train_and_evaluate(model_gen):
     galileo.io.log_metadata('train_time', time.time() - start_train)
     log_all_meta()
     start_eval = time.time()
-    x_eval, y_eval = load_evaluation_data(server)
-    evaluation_data = x_eval[-10:], y_eval[-10:]
+    evaluation_data = load_evaluation_data(server)
     intersection, union = evaluate_model(sess, model, evaluation_data)
     galileo.io.log_metadata('eval_time', time.time() - start_eval)
     print('final intersection', intersection, 'union', union)
