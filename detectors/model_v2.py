@@ -22,11 +22,6 @@ class ModelV2(ModelBase):
     relu = activation_functions['relu']
     sigmoid = activation_functions['sigmoid']
     in_tensor = x
-    in_tensor = relu(bn(conv2d(
-      in_tensor=in_tensor,
-      kernel=assignments.get('input_kernel', 7),
-      output=features,
-    )))
     for i in range(assignments.get('num_conv', 2)):
       block_features = assignments.get('block_features', 256)
       shortcut = bn(conv2d(in_tensor, 1, block_features))
@@ -42,9 +37,14 @@ class ModelV2(ModelBase):
       ))
       in_tensor = in_tensor + shortcut
 
-    return sigmoid(bn(conv2d(
+    output_1 = relu(bn(conv2d(
       in_tensor=in_tensor,
-      kernel=assignments.get('output_kernel', 32),
+      kernel=assignments.get('output1_kernel', 5),
+      output=assignments.get('output1_features', 256),
+    )))
+    activation = sigmoid(bn(conv2d(
+      in_tensor=in_tensor,
+      kernel=assignments.get('activation_kernel', 5),
       output=1,
     )))
 
