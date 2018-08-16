@@ -14,21 +14,26 @@ optimization:
       bounds:
         min: 1
         max: 64
+    - name: block_features
+      type: int
+      bounds:
+        min: 1
+        max: 1024
     - name: conv1_kernel
       type: int
       bounds:
         min: 1
         max: 11
+    - name: conv1_features
+      type: int
+      bounds:
+        min: 1
+        max: 1024
     - name: conv2_kernel
       type: int
       bounds:
         min: 1
         max: 11
-    - name: features
-      type: int
-      bounds:
-        min: 1
-        max: 1024
     - name: image_size
       type: int
       bounds:
@@ -42,8 +47,8 @@ optimization:
     - name: num_conv
       type: int
       bounds:
-        min: 0
-        max: 4
+        min: 1
+        max: 8
     - name: output_kernel
       type: int
       bounds:
@@ -52,13 +57,13 @@ optimization:
     - name: log_learning_rate
       type: double
       bounds:
-        min: -10
+        min: -8
         max: 0
     - name: training_minutes
       type: double
       bounds:
         min: 5
-        max: 20
+        max: 60
   parallel_bandwidth: 2
   observation_budget: 200
 aws:
