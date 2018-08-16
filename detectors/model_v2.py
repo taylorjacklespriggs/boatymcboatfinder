@@ -4,12 +4,12 @@ from constants import activation_functions, assignments, x, y, training_mode
 from model_base import ModelBase
 
 def conv2d(in_tensor, kernel, output):
-    in_features = in_tensor.get_shape()[3].value
-    return tf.nn.conv2d(
-      in_tensor,
-      filter=[kernel, kernel, in_features, output],
-      strides=[1, 1, 1, 1],
-      padding='SAME',
+    return tf.layers.conv2d(
+      inputs=in_tensor,
+      filters=output,
+      kernel_size=kernel,
+      strides=1,
+      padding='same',
       use_bias=False,
       kernel_initializer=tf.variance_scaling_initializer(),
     )
