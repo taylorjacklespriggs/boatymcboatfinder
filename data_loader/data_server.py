@@ -129,7 +129,7 @@ def train_batch():
 def evaluation_batch():
   image_loaders = [img_loader for image_loaders in (
     (sample.load_image for sample in evaluation_samples),
-    (lambda: load_mask(sample) for sample in evaluation_samples),
+    ((lambda: load_mask(sample)) for sample in evaluation_samples),
   ) for img_loader in image_loaders]
   return send_file(
     io.BufferedReader(ImageReader((len(evaluation_samples), 768, 768), image_loaders)),
