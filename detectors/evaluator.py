@@ -25,8 +25,8 @@ def train_and_evaluate(model_gen):
   training_loader = TrainingDataLoader(
     server,
     multi_fetch=assignments.get('multi_batch', 16),
-    batch_size=assignments['batch_size'],
-    image_size=assignments['image_size'],
+    batch_size=assignments.get('batch_size', 1),
+    image_size=assignments.get('image_size', 1),
     blank_prob=assignments.get('blank_prob', 0.2),
   )
   multi_batch_epochs = assignments.get('multi_batch_epochs', 1)
@@ -36,7 +36,7 @@ def train_and_evaluate(model_gen):
     start_train = time.time()
     load_time = 0.
     batch_time = 0.
-    remaining_time = assignments.get('training_minutes', 5) * 60
+    remaining_time = assignments.get('training_minutes', 1) * 60
     batches = 0
 
     def log_all_meta():
