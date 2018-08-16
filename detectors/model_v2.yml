@@ -7,66 +7,54 @@ run:
   -  python model_v2.py
 optimization:
   metrics:
-    - name: negative_log_loss
+    - name: iou
   parameters:  # Fill in parameters to optimize
-    - name: num_conv
-      type: int
-      bounds:
-        min: 0
-        max: 6
-    - name: conv_kernel
-      type: int
-      bounds:
-        min: 2
-        max: 9
-    - name: conv_output
-      type: int
-      bounds:
-        min: 2
-        max: 256
-    - name: conv_act
-      type: categorical
-      categorical_values:
-        - relu
-        - sigmoid
-        - tanh
-    - name: output_kernel
-      type: int
-      bounds:
-        min: 2
-        max: 9
-    - name: optimizer
-      type: categorical
-      categorical_values:
-        - gradient_descent
-        - rmsprop
-        - adam
-    - name: log_learning_rate
-      type: double
-      bounds:
-        min: -6
-        max: -0
     - name: batch_size
       type: int
       bounds:
         min: 1
-        max: 10
-    - name: blank_prob
-      type: double
-      bounds:
-        min: 0
-        max: 1
-    - name: batches
+        max: 64
+    - name: conv_kernel
       type: int
       bounds:
         min: 1
-        max: 1000
+        max: 32
+    - name: features
+      type: int
+      bounds:
+        min: 1
+        max: 1024
     - name: image_size
       type: int
       bounds:
         min: 10
         max: 768
-  parallel_bandwidth: 4
+    - name: input_kernel
+      type: int
+      bounds:
+        min: 1
+        max: 64
+    - name: num_conv
+      type: int
+      bounds:
+        min: 0
+        max: 4
+    - name: output_kernel
+      type: int
+      bounds:
+        min: 1
+        max: 64
+    - name: log_learning_rate
+      type: double
+      bounds:
+        min: -10
+        max: 0
+    - name: training_minutes
+      type: double
+      bounds:
+        min: 5
+        max: 20
+  parallel_bandwidth: 2
   observation_budget: 200
 aws:
   # Region and access key are not needed if the user has configured their AWS CLI locally
