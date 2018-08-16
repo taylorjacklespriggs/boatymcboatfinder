@@ -62,7 +62,6 @@ class ImageReader(object):
 
   def __init__(self, shape, image_loaders):
     self.current_buffer = self._wrap_buffer(np.array(shape, dtype=np.uint32))
-    self.load_threads = Thread(target=lambda: self.load_images)
     with ThreadPoolExecutor(max_workers=16) as executor:
       self.buffers = executor.map(
         func=lambda img_load: self._wrap_buffer(img_load()),
