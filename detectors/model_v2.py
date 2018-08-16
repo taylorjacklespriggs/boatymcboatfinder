@@ -13,7 +13,7 @@ def create_conv_block(in_tensor, kernel, output, activation):
     ))
     conv = tf.nn.conv2d(in_tensor, w_c, strides=[1, 1, 1, 1], padding='SAME')
     bn_conv = tf.layers.batch_normalization(conv, training=training_mode)
-    return activation_functions[activation](conv_w_bias)
+    return activation_functions[activation](bn_bias)
 
 class ModelV2(ModelBase):
   def create_model(self):
@@ -21,18 +21,25 @@ class ModelV2(ModelBase):
     in_tensor = x
     in_tensor = create_conv_block(
       in_tensor=in_tensor,
-      kernel=assignments.get('input_kernel', 7)
+      kernel=assignments.get('input_kernel', 7),
       output=features,
       activation='relu',
     )
-    in_tensor = tf.layers.batch_normalization(in_tensor, training=training_mode)
     for i in range(assignments.get('num_conv', 2)):
+      ident = in_tensor
       in_tensor = create_conv_block(
         in_tensor=in_tensor,
-        kernel=assignments.get('conv_kernel', 5),
+        kernel=assignments.get('conv1_kernel', 5),
         output=features,
         activation='relu',
-      ) + in_tensor
+      )
+      in_tensor = create_conv_block(
+        in_tensor=in_tensor,
+        kernel=assignments.get('conv2_kernel', 5),
+        output=features,
+        activation='relu',
+      )
+      in_tensor = in_tensor + ident
 
     return create_conv_block(
       in_tensor=in_tensor,
