@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from flask import Flask, request, send_file
 import io
 import numpy as np
@@ -59,9 +60,14 @@ class Subsample(object):
 class ImageReader(object):
   closed = False
 
-  def __init__(self, shape, image_gen):
-    self.buffers = (self._wrap_buffer(img) for img in image_gen)
+  def __init__(self, shape, image_loaders):
     self.current_buffer = self._wrap_buffer(np.array(shape, dtype=np.uint32))
+    self.load_threads = Thread(target=lambda: self.load_images)
+    with ThreadPoolExecutor(max_workers=16) as executor:
+      self.buffers = executor.map(
+        func=lambda img_load: self._wrap_buffer(img_load()),
+        *image_loaders,
+      )
 
   def _wrap_buffer(self, img):
     buff = io.BytesIO()
@@ -103,31 +109,31 @@ def get_training_samples_with_blanks(batch_size, blank_prob):
 def train_batch():
   batch_size = int(request.args.get('batch_size', '1'))
   image_size = int(request.args.get('image_size', '768'))
-  blank_prob = float(request.args.get('blank_prob', '0.8'))
+  blank_prob = float(request.args.get('blank_prob', '0.2'))
 
   subsamples = [
     Subsample(image_size, sample)
     for sample in get_training_samples_with_blanks(batch_size, blank_prob)
   ]
-  images = (img for images in (
-    (sample.load_image() for sample in subsamples),
-    (sample.load_mask() for sample in subsamples),
-  ) for img in images)
+  image_loaders = [img_loader for image_loaders in (
+    (sample.load_image for sample in subsamples),
+    (sample.load_mask for sample in subsamples),
+  ) for img_loader in image_loaders]
 
   return send_file(
-    io.BufferedReader(ImageReader((batch_size, image_size, image_size), images)),
+    io.BufferedReader(ImageReader((batch_size, image_size, image_size), image_loaders)),
     attachment_filename='batch.raw',
     mimetype='application/octet-stream',
   )
 
 @app.route('/evaluation_batch')
 def evaluation_batch():
-  images = (img for images in (
-    (sample.load_image() for sample in evaluation_samples),
-    (load_mask(sample) for sample in evaluation_samples),
-  ) for img in images)
+  image_loaders = [img_loader for image_loaders in (
+    (sample.load_image for sample in evaluation_samples),
+    (lambda: load_mask(sample) for sample in evaluation_samples),
+  ) for img_loader in image_loaders]
   return send_file(
-    io.BufferedReader(ImageReader((len(evaluation_samples), 768, 768), images)),
+    io.BufferedReader(ImageReader((len(evaluation_samples), 768, 768), image_loaders)),
     attachment_filename='batch.raw',
     mimetype='application/octet-stream',
   )
