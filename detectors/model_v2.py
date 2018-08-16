@@ -6,7 +6,7 @@ from model_base import ModelBase
 def conv2d(in_tensor, kernel, output):
     in_features = in_tensor.get_shape()[3].value
     return tf.nn.conv2d(
-      inputs=in_tensor,
+      in_tensor,
       filter=[kernel, kernel, in_features, output],
       strides=[1, 1, 1, 1],
       padding='SAME',
