@@ -13,57 +13,57 @@ optimization:
       type: int
       bounds:
         min: 1
-        max: 64
+        max: 41
     - name: batch_size
       type: int
       bounds:
         min: 1
-        max: 64
+        max: 40
     - name: block_features
       type: int
       bounds:
         min: 1
         max: 1024
-    - name: conv1_kernel
-      type: int
-      bounds:
-        min: 1
-        max: 7
     - name: conv1_features
       type: int
       bounds:
         min: 1
-        max: 1024
+        max: 512
+    - name: conv1_kernel
+      type: int
+      bounds:
+        min: 1
+        max: 5
     - name: conv2_kernel
       type: int
       bounds:
         min: 1
-        max: 7
+        max: 5
     - name: image_size
       type: int
       bounds:
         min: 64
-        max: 256
+        max: 128
     - name: log_learning_rate
       type: double
       bounds:
-        min: -8
-        max: 0
+        min: -5
+        max: -1
     - name: num_conv
       type: int
       bounds:
         min: 1
-        max: 16
-    - name: output1_kernel
-      type: int
-      bounds:
-        min: 1
-        max: 7
+        max: 8
     - name: output1_features
       type: int
       bounds:
         min: 1
-        max: 1024
+        max: 512
+    - name: output1_kernel
+      type: int
+      bounds:
+        min: 1
+        max: 5
     - name: training_minutes
       type: double
       bounds:
