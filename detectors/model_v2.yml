@@ -68,7 +68,7 @@ optimization:
       type: double
       bounds:
         min: 6
-        max: 120
+        max: 36
   parallel_bandwidth: 2
   observation_budget: 200
 aws:
