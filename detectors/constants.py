@@ -6,7 +6,7 @@ try:
 except ImportError:
   assignments = {}
 
-image_size = assignments.setdefault('image_size', 768)
+full_size = 768
 
 x = tf.placeholder(tf.float32, [None, None, None, 4])
 y = tf.placeholder(tf.float32, [None, None, None, 1])

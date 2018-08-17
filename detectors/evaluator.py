@@ -3,7 +3,7 @@ import tensorflow as tf
 import time
 
 from data_loader import TrainingDataLoader, load_evaluation_data
-from constants import assignments, x, y
+from constants import assignments, x, y, full_size
 
 def evaluate_model(session, model, evaluation_data):
   count = 1
@@ -22,17 +22,17 @@ def train_and_evaluate(model_gen):
   galileo.io.log_metadata('start_time', time.time())
 
   server = 'ec2-54-244-7-55.us-west-2.compute.amazonaws.com:5000'
+  batch_size = assignments.get('batch_size', 1)
+  image_size = assignments.get('image_size', 1)
   training_loader = TrainingDataLoader(
     server,
     multi_fetch=assignments.get('multi_batch', 16),
-    batch_size=assignments.get('batch_size', 1),
-    image_size=assignments.get('image_size', 1),
+    batch_size=batch_size,
+    image_size=image_size,
     blank_prob=assignments.get('blank_prob', 0.2),
   )
   multi_batch_epochs = assignments.get('multi_batch_epochs', 1)
   with tf.Session() as sess:
-    model = model_gen()
-    sess.run(tf.global_variables_initializer())
     start_train = time.time()
     load_time = 0.
     batch_time = 0.
@@ -45,6 +45,23 @@ def train_and_evaluate(model_gen):
         galileo.io.log_metadata('average_batch_time', batch_time / batches)
       galileo.io.log_metadata('remaining_time', remaining_time)
       galileo.io.log_metadata('batches', batches)
+
+    try:
+      model = model_gen()
+      sess.run(tf.global_variables_initializer())
+
+      model.evaluate(
+        np.zeros((batch_size, image_size, image_size, 4)),
+        np.zeros((batch_size, image_size, image_size, 1)),
+      )
+      model.evaluate(
+        np.zeros((1, full_size, full_size, 4)),
+        np.zeros((1, full_size, full_size, 1)),
+      )
+    except Exception:
+      log_all_meta()
+      galileo.io.log_metadata('failure_reason', 'initialization_memory')
+      raise
 
     while remaining_time > 0:
       print('remaining time for training', remaining_time)
@@ -64,7 +81,7 @@ def train_and_evaluate(model_gen):
           print('avg loss', loss / len(multi_batch))
       except Exception:
         log_all_meta()
-        galileo.io.log_metadata('failure_reason', 'memory')
+        galileo.io.log_metadata('failure_reason', 'training_memory')
         raise
       t = time.time() - start_batch
       print('seconds to train batch', t)
