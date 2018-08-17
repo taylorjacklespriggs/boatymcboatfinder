@@ -18,7 +18,7 @@ optimization:
       type: int
       bounds:
         min: 1
-        max: 128
+        max: 64
     - name: block_features
       type: int
       bounds:
@@ -28,7 +28,7 @@ optimization:
       type: int
       bounds:
         min: 1
-        max: 16
+        max: 7
     - name: conv1_features
       type: int
       bounds:
@@ -38,7 +38,7 @@ optimization:
       type: int
       bounds:
         min: 1
-        max: 16
+        max: 7
     - name: image_size
       type: int
       bounds:
@@ -58,7 +58,7 @@ optimization:
       type: int
       bounds:
         min: 1
-        max: 16
+        max: 7
     - name: output1_features
       type: int
       bounds:
