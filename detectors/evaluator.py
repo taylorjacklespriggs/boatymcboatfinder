@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import tensorflow as tf
 import time
 
@@ -50,13 +51,19 @@ def train_and_evaluate(model_gen):
       model = model_gen()
       sess.run(tf.global_variables_initializer())
 
-      model.evaluate(
-        np.zeros((batch_size, image_size, image_size, 4)),
-        np.zeros((batch_size, image_size, image_size, 1)),
+      model.train_batch(
+        sess,
+        (
+          np.zeros((batch_size, image_size, image_size, 4)),
+          np.zeros((batch_size, image_size, image_size, 1)),
+        ),
       )
       model.evaluate(
-        np.zeros((1, full_size, full_size, 4)),
-        np.zeros((1, full_size, full_size, 1)),
+        sess,
+        (
+          np.zeros((1, full_size, full_size, 4)),
+          np.zeros((1, full_size, full_size, 1)),
+        ),
       )
     except Exception:
       log_all_meta()
