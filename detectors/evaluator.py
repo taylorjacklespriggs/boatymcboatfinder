@@ -51,7 +51,7 @@ def train_and_evaluate(model_gen):
       model = model_gen()
       sess.run(tf.global_variables_initializer())
 
-      model.train_batch(
+      model.evaluate(
         sess,
         (
           np.zeros((batch_size, image_size, image_size, 4)),
