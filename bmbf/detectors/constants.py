@@ -8,6 +8,7 @@ except ImportError:
 
 full_size = 768
 
+batch_size = tf.placeholder(tf.int32)
 x = tf.placeholder(tf.float32, [None, None, None, 4])
 y = tf.placeholder(tf.float32, [None, None, None, 1])
 training_mode = tf.placeholder("bool")

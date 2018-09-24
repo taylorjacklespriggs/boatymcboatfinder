@@ -2,6 +2,8 @@ from collections import defaultdict
 import numpy as np
 from PIL import Image
 
+full_image_size = 768
+
 class Segmentation(object):
   def __init__(self, start, run):
     self.start = start
@@ -32,9 +34,14 @@ class Sample(object):
     flat_data = np.asarray(pil_image, dtype=np.int32).astype(np.uint8)
     return flat_data.transpose((1, 0, 2)).copy()
 
-  def apply_segmentations(self, image, value):
-    for segmentation in self.segmentations:
-      segmentation.apply_to_image(image, value)
+  def load_mask(self):
+    mask = np.zeros((full_image_size, full_image_size, 1), dtype=np.uint8)
+    self.apply_segmentations(mask)
+    return mask
+
+  def apply_segmentations(self, image):
+    for i, segmentation in enumerate(self.segmentations):
+      segmentation.apply_to_image(image, i)
 
   def __repr__(self):
     return 'Sample(n_segmentations={})'.format(len(self.segmentations))
