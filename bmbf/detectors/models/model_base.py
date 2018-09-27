@@ -4,7 +4,7 @@ from keras.optimizers import Adam
 import numpy as np
 import tensorflow as tf
 
-from bmbf.detectors.constants import assignments, batch_size, optimizer, x, y, training_mode, learning_rate
+from bmbf.detectors.constants import optimizer
 
 def safe_log(value):
   return tf.cond(
@@ -13,28 +13,30 @@ def safe_log(value):
     false_fn=lambda: 0.,
   )
 
-def threshhold(tensor, thresh=1):
-  return tf.cast(tensor > thresh, tf.float32)
-
 def iou_loss(labels, pred):
   correct_pred = tf.reduce_sum(labels * pred)
   total_pred = tf.reduce_sum(pred)
-  return tf.log(total_pred + tf.reduce_sum(labels) - correct_pred) - tf.log(correct_pred)
+  return safe_log(total_pred + tf.reduce_sum(labels) - correct_pred) - safe_log(correct_pred)
+
+def iou(labels, pred):
+  binary_pred = pred > 0.5
+  intersection = tf.reduce_sum(labels * binary_pred)
+  return tf.reduce_sum(labels) + tf.reduce_sum(binary_pred) - intersection
 
 class ModelBase(object):
   def __init__(self):
     self.input = Input(shape=(768, 768, 4))
-    self.model = self.create_model()
+    self.model = Model(inputs=self.input, outputs=self.create_model())
     self.model.compile(
       optimizer=optimizer,
       loss=iou_loss,
-      metrics=['accuracy'],
+      metrics=[iou],
     )
 
-  def train(self, batch_gen, evaluation_data):
+  def train(self, batch_gen, steps, evaluation_data):
     return self.model.fit_generator(
       generator=batch_gen,
-      steps_per_epoch=10,
+      steps_per_epoch=steps,
       validation_data=evaluation_data,
     )
 

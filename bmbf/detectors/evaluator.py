@@ -4,7 +4,13 @@ import random
 import time
 
 from bmbf.data_loader.data_server import get_training_samples_with_blanks, evaluation_samples
-from bmbf.detectors.constants import assignments, x, y, full_size
+from bmbf.detectors.constants import assignments
+
+input_transform = np.array([
+  [1, 0, 0, 0],
+  [0, 1, 0, 0],
+  [0, 0, 1, 0],
+], dtype=np.float32) / 255
 
 def evaluate_model(session, model, evaluation_data):
   count = 1
@@ -19,7 +25,11 @@ def evaluate_model(session, model, evaluation_data):
   return intersection, union
 
 def create_batch(samples):
-  X = np.stack([sample.load_image() for sample in samples], axis=0).astype(np.float32)
+  X = np.einsum(
+    'bhwc,co->bhwo',
+    np.stack([sample.load_image() for sample in samples], axis=0),
+    input_transform,
+  )
   Y = np.stack([sample.load_mask() for sample in samples], axis=0).astype(np.float32)
   Y[Y > 0] = 1
   return X, Y
@@ -35,24 +45,10 @@ def train_and_evaluate(model_gen):
   import orchestrate.io as orc
   orc.log_metadata('start_time', time.time())
 
-  batch_size = assignments.get('batch_size', 1)
-  blank_prob = assignments.get('blank_prob', 0)
+  batch_size = assignments.get('batch_size', 4)
+  blank_prob = assignments.get('blank_prob', 0.2)
+  train_steps = assignments.get('train_steps', 4096)
 
   model = model_gen()
 
-  model.evaluate(
-    sess,
-    (
-      np.zeros((batch_size, full_size, full_size, 4)),
-      np.zeros((batch_size, full_size, full_size, 1)),
-    ),
-  )
-  model.evaluate(
-    sess,
-    (
-      np.zeros((1, full_size, full_size, 4)),
-      np.zeros((1, full_size, full_size, 1)),
-    ),
-  )
-
-  model.train(batch_gen(batch_size, blank_prob), evaluation_data)
+  model.train(batch_gen(batch_size, blank_prob), train_steps, evaluation_data)

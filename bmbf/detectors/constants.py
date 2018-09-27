@@ -1,5 +1,5 @@
 from keras import backend as K
-from keras.layers import Concat, Input
+from keras.layers import Concatenate, Dot, Input
 from keras.optimizers import Adam
 import tensorflow as tf
 
@@ -12,9 +12,5 @@ except ImportError:
 full_size = 768
 
 batch_size = tf.placeholder(tf.int32)
-input = Concat(axis=3)([
-  Input(shape=(full_size, full_size, 3,)),
-  K.ones(shape=(full_size, full_size, 1)),
-])
 
 optimizer = Adam(lr=assignments.setdefault('log_learning_rate', -3))
