@@ -1,0 +1,73 @@
+name: Boaty McBoatfinder M1
+resources_per_model:
+  gpus: 4
+framework: keras
+language: python3.6
+run:
+  -  ./run
+optimization:
+  metrics:
+    - name: iou
+  parameters:  # Fill in parameters to optimize
+    # model params
+    - name: n_conv_num
+      type: int
+      bounds:
+        min: 1
+        max: 3
+    - name: n_conv_kernel
+      type: int
+      bounds:
+        min: 1
+        max: 7
+    - name: pool_size
+      type: int
+      bounds:
+        min: 2
+        max: 8
+    - name: log_base_features
+      type: double
+      bounds:
+        min: 2
+        max: 8
+    - name: feature_multiplier
+      type: double
+      bounds:
+        min: 1
+        max: 3
+    - name: depth
+      type: int
+      bounds:
+        min: 1
+        max: 8
+    - name: activation
+      type: categorical
+      categorical_values:
+        - relu
+        - sigmoid
+    # training params
+    - name: log_learning_rate
+      type: double
+      bounds:
+        min: -6
+        max: 0
+    - name: batch_size
+      type: int
+      bounds:
+        min: 1
+        max: 64
+    - name: blank_prob
+      type: double
+      bounds:
+        min: 0
+        max: 1
+    - name: log_train_steps
+      type: double
+      bounds:
+        min: 6
+        max: 12
+  parallel_bandwidth: 2
+  observation_budget: 200
+aws:
+  ecr:
+    repository: galileo/bmbf-m1

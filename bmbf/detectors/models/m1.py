@@ -62,7 +62,8 @@ def skip_network(in_tensor, layer_params, base_params):
 N_CONV_NUM = orch.assignment('n_conv_num', 2)
 N_CONV_KERNEL = orch.assignment('n_conv_kernel', 3)
 POOL_SIZE = orch.assignment('pool_size', 2)
-BASE_POWER = orch.assignment('base_power', 4)
+BASE_FEATURES = 2**orch.assignment('log_base_features', 4)
+FEATURE_MULTIPLIER = orch.assignment('feature_multiplier', 2)
 DEPTH = orch.assignment('depth', 5)
 class M1(ModelBase):
   def create_model(self):
@@ -72,15 +73,15 @@ class M1(ModelBase):
       [(
         N_CONV_NUM,
         N_CONV_KERNEL,
-        int(2**(i + BASE_POWER)),
+        int(BASE_FEATURES * FEATURE_MULTIPLIER**i),
         POOL_SIZE,
         N_CONV_NUM,
         N_CONV_KERNEL,
-        int(2**(i + BASE_POWER)),
+        int(BASE_FEATURES * FEATURE_MULTIPLIER**i),
       ) for i in range(DEPTH)],
-      (N_CONV_NUM, N_CONV_KERNEL, int(2**(DEPTH + BASE_POWER))),
+      (N_CONV_NUM, N_CONV_KERNEL, int(BASE_FEATURES * FEATURE_MULTIPLIER**DEPTH)),
     )
-    return Activation(orch.assignment('activation', 'relu'))(bn(conv2d(skip_net, 1, 1)))
+    return Activation(orch.assignment('activation', 'sigmoid'))(bn(conv2d(skip_net, 1, 1)))
 
 
 if __name__ == '__main__':
