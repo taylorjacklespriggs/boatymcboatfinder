@@ -57,4 +57,4 @@ class ModelBase(object):
       x=x_data,
       y=y_data,
       batch_size=1,
-     )
+    )
