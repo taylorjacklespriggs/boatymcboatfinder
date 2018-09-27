@@ -1,4 +1,5 @@
 from keras.layers import Activation, BatchNormalization, Concatenate, Conv2D, Conv2DTranspose, MaxPooling2D
+import orchestrate.io as orch
 
 from bmbf.detectors.models.model_base import ModelBase
 
@@ -58,11 +59,11 @@ def skip_network(in_tensor, layer_params, base_params):
     num_convs, kernel, out_features = base_params
     return n_conv_block(in_tensor, num_convs, kernel, out_features), out_features
 
-N_CONV_NUM = 2
-N_CONV_KERNEL = 3
-POOL_SIZE = 2
-BASE_POWER = 4
-DEPTH = 5
+N_CONV_NUM = orch.assignment('n_conv_num', 2)
+N_CONV_KERNEL = orch.assignment('n_conv_kernel', 3)
+POOL_SIZE = orch.assignment('pool_size', 2)
+BASE_POWER = orch.assignment('base_power', 4)
+DEPTH = orch.assignment('depth', 5)
 class M1(ModelBase):
   def create_model(self):
     in_tensor = self.input
@@ -71,15 +72,15 @@ class M1(ModelBase):
       [(
         N_CONV_NUM,
         N_CONV_KERNEL,
-        2**(i + BASE_POWER),
+        int(2**(i + BASE_POWER)),
         POOL_SIZE,
         N_CONV_NUM,
         N_CONV_KERNEL,
-        2**(i + BASE_POWER),
+        int(2**(i + BASE_POWER)),
       ) for i in range(DEPTH)],
-      (N_CONV_NUM, N_CONV_KERNEL, 2**(DEPTH + BASE_POWER)),
+      (N_CONV_NUM, N_CONV_KERNEL, int(2**(DEPTH + BASE_POWER))),
     )
-    return Activation('sigmoid')(bn(conv2d(skip_net, 1, 1)))
+    return Activation(orch.assignment('activation', 'relu'))(bn(conv2d(skip_net, 1, 1)))
 
 
 if __name__ == '__main__':

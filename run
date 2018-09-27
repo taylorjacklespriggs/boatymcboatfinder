@@ -1,0 +1,2 @@
+./get_data.sh
+PYTHONPATH=. python -m bmbf.detectors.models.m1

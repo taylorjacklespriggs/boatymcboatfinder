@@ -1,10 +1,10 @@
 import math
 import numpy as np
+import orchestrate.io as orch
 import random
 import time
 
 from bmbf.data_loader.data import get_training_samples_with_blanks, evaluation_samples
-from bmbf.detectors.constants import assignments
 
 input_transform = np.array([
   [1, 0, 0, 0],
@@ -44,13 +44,18 @@ def train_and_evaluate(model_gen):
   import orchestrate.io as orc
   orc.log_metadata('start_time', time.time())
 
-  batch_size = assignments.get('batch_size', 4)
-  blank_prob = assignments.get('blank_prob', 0.2)
-  train_steps = assignments.get('train_steps', 1)
+  batch_size = orch.assignment('batch_size', 4)
+  blank_prob = orch.assignment('blank_prob', 0.2)
+  train_steps = orch.assignment('train_steps', 1)
 
   model = model_gen()
 
   model.train(batch_gen(batch_size, blank_prob), train_steps)
 
   evaluation_data = create_batch(evaluation_samples)
-  print(model.evaluate(evaluation_data))
+  loss, intersection, union, iou = model.evaluate(evaluation_data)
+  orch.log_metric('evaluation_loss', loss)
+  orch.log_metric('intersection', intersection)
+  orch.log_metadata('union', union)
+  orch.log_metric('negative_union', -union)
+  orch.log_metric('iou', iou)
