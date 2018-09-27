@@ -21,7 +21,9 @@ def iou_loss(labels, pred):
 def iou(labels, pred):
   binary_pred = tf.cast(pred > 0.5, tf.float32)
   intersection = tf.reduce_sum(labels * binary_pred)
-  return tf.reduce_sum(labels) + tf.reduce_sum(binary_pred) - intersection
+  return intersection / (
+    tf.reduce_sum(labels) + tf.reduce_sum(binary_pred) - intersection
+  )
 
 class ModelBase(object):
   def __init__(self):
