@@ -39,7 +39,6 @@ def batch_gen(batch_size, blank_prob):
     samples = get_training_samples_with_blanks(batch_size, blank_prob)
     yield create_batch(samples)
 
-evaluation_data = create_batch(evaluation_samples)
 
 def train_and_evaluate(model_gen):
   import orchestrate.io as orc
@@ -47,8 +46,11 @@ def train_and_evaluate(model_gen):
 
   batch_size = assignments.get('batch_size', 4)
   blank_prob = assignments.get('blank_prob', 0.2)
-  train_steps = assignments.get('train_steps', 4096)
+  train_steps = assignments.get('train_steps', 1)
 
   model = model_gen()
 
-  model.train(batch_gen(batch_size, blank_prob), train_steps, evaluation_data)
+  model.train(batch_gen(batch_size, blank_prob), train_steps)
+
+  evaluation_data = create_batch(evaluation_samples)
+  print(model.evaluate(evaluation_data))

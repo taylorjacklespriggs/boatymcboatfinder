@@ -18,12 +18,16 @@ def iou_loss(labels, pred):
   total_pred = tf.reduce_sum(pred)
   return safe_log(total_pred + tf.reduce_sum(labels) - correct_pred) - safe_log(correct_pred)
 
+def intersection(labels, pred):
+  return tf.reduce_sum(tf.cast(labels * pred > 0.5, tf.float32))
+
+def union(labels, pred):
+  return tf.reduce_sum(labels) \
+    + tf.reduce_sum(tf.cast(pred > 0.5, tf.float32)) \
+    - intersection(labels, pred)
+
 def iou(labels, pred):
-  binary_pred = tf.cast(pred > 0.5, tf.float32)
-  intersection = tf.reduce_sum(labels * binary_pred)
-  return intersection / (
-    tf.reduce_sum(labels) + tf.reduce_sum(binary_pred) - intersection
-  )
+  return intersection(labels, pred) / union(labels, pred)
 
 class ModelBase(object):
   def __init__(self):
@@ -32,14 +36,13 @@ class ModelBase(object):
     self.model.compile(
       optimizer=optimizer,
       loss=iou_loss,
-      metrics=[iou],
+      metrics=[intersection, union, iou],
     )
 
-  def train(self, batch_gen, steps, evaluation_data):
+  def train(self, batch_gen, steps):
     return self.model.fit_generator(
       generator=batch_gen,
       steps_per_epoch=steps,
-      validation_data=evaluation_data,
     )
 
   def forward(self, x_data):
@@ -47,3 +50,10 @@ class ModelBase(object):
       x_data[np.newaxis],
       self.model,
     )[0]
+
+  def evaluate(self, evaluation_data):
+    x_data, y_data = evaluation_data
+    return self.model.evaluate(
+      x=x_data,
+      y=y_data,
+     )
