@@ -3,7 +3,7 @@ import numpy as np
 import random
 import time
 
-from bmbf.data_loader.data_server import get_training_samples_with_blanks, evaluation_samples
+from bmbf.data_loader.data import get_training_samples_with_blanks, evaluation_samples
 from bmbf.detectors.constants import assignments
 
 input_transform = np.array([
