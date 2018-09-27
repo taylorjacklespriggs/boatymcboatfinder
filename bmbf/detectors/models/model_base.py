@@ -51,10 +51,10 @@ class ModelBase(object):
       self.model,
     )[0]
 
-  def evaluate(self, evaluation_data):
+  def evaluate(self, evaluation_data, batch_size=1):
     x_data, y_data = evaluation_data
     return self.model.evaluate(
       x=x_data,
       y=y_data,
-      batch_size=1,
+      batch_size=batch_size,
     )
