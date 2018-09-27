@@ -1,6 +1,5 @@
 import numpy as np
 
-from bmbf.constants import full_size
 from bmbf.data_loader.sample_loader import load_samples
 
 cv_parts = 400
