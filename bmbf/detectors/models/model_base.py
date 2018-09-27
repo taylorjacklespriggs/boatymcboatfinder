@@ -56,4 +56,5 @@ class ModelBase(object):
     return self.model.evaluate(
       x=x_data,
       y=y_data,
+      batch_size=1,
      )
