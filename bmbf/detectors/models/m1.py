@@ -6,14 +6,14 @@ from bmbf.detectors.models.model_base import ModelBase
 def bn(in_tensor):
   return tf.layers.batch_normalization(in_tensor, training=training_mode)
 
-def conv2d(in_tensor, kernel, out_features, activation='relu'):
+def conv2d(in_tensor, kernel, out_features, init_factor=2):
   in_features = in_tensor.shape[3].value
   w_c = tf.Variable(tf.random_normal(
     [kernel, kernel, in_features, out_features],
     dtype=tf.float32,
-  ) * tf.sqrt(2 / in_features))
+  ) * tf.sqrt(init_factor / (in_features * kernel**2)))
   conv = tf.nn.conv2d(in_tensor, w_c, strides=[1, 1, 1, 1], padding='SAME')
-  return activation_functions[activation](conv)
+  return conv
 
 def max_pool(in_tensor, size):
   return tf.nn.max_pool(
@@ -29,7 +29,7 @@ def up_conv2d(in_tensor, kernel, result_size):
   w_c = tf.Variable(tf.random_normal(
     [kernel, kernel, in_features, in_features],
     dtype=tf.float32,
-  ) * tf.sqrt(2 / in_features))
+  ) * tf.sqrt(2 / (in_features * kernel**2)))
   conv = tf.nn.conv2d_transpose(
     in_tensor,
     w_c,
@@ -41,12 +41,12 @@ def up_conv2d(in_tensor, kernel, result_size):
 
 def n_conv_block(in_tensor, num_convolutions, kernel, out_features):
   if num_convolutions:
-    return bn(n_conv_block(
-      conv2d(in_tensor, kernel, out_features),
+    return n_conv_block(
+      tf.nn.relu(bn(conv2d(in_tensor, kernel, out_features))),
       num_convolutions - 1,
       kernel,
       out_features,
-    ))
+    )
   else:
     return in_tensor
 
@@ -75,8 +75,8 @@ def skip_network(in_tensor, layer_params, base_params, size=768):
 N_CONV_NUM = 2
 N_CONV_KERNEL = 3
 POOL_SIZE = 2
-BASE_POWER = 3
-DEPTH = 1
+BASE_POWER = 5
+DEPTH = 5
 class M1(ModelBase):
   def create_model(self):
     in_tensor = x
@@ -93,7 +93,7 @@ class M1(ModelBase):
       ) for i in range(DEPTH)],
       (N_CONV_NUM, N_CONV_KERNEL, 2**(DEPTH + BASE_POWER)),
     )
-    return bn(tf.sigmoid(conv2d(skip_net, 1, 1)))
+    return tf.nn.relu(bn(conv2d(skip_net, 1, 1)))
 
 
 if __name__ == '__main__':

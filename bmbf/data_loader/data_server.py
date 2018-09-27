@@ -6,7 +6,7 @@ import random
 
 from bmbf.data_loader.sample_loader import load_samples
 
-cv_parts = 500
+cv_parts = 400
 
 app = Flask(__name__)
 app.debug = True
