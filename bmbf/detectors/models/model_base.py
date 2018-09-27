@@ -19,7 +19,7 @@ def iou_loss(labels, pred):
   return safe_log(total_pred + tf.reduce_sum(labels) - correct_pred) - safe_log(correct_pred)
 
 def iou(labels, pred):
-  binary_pred = pred > 0.5
+  binary_pred = tf.cast(pred > 0.5, tf.float32)
   intersection = tf.reduce_sum(labels * binary_pred)
   return tf.reduce_sum(labels) + tf.reduce_sum(binary_pred) - intersection
 
