@@ -1,3 +1,6 @@
+from keras import backend as K
+from keras.layers import Concat, Input
+from keras.optimizers import Adam
 import tensorflow as tf
 
 try:
@@ -9,21 +12,9 @@ except ImportError:
 full_size = 768
 
 batch_size = tf.placeholder(tf.int32)
-x = tf.placeholder(tf.float32, [None, None, None, 4])
-y = tf.placeholder(tf.float32, [None, None, None, 1])
-training_mode = tf.placeholder("bool")
-learning_rate = tf.placeholder(tf.float32)
+input = Concat(axis=3)([
+  Input(shape=(full_size, full_size, 3,)),
+  K.ones(shape=(full_size, full_size, 1)),
+])
 
-activation_functions = {
-  'relu': tf.nn.relu,
-  'sigmoid': tf.sigmoid,
-  'tanh': tf.tanh,
-}
-
-optimizers = {
-  'gradient_descent': tf.train.GradientDescentOptimizer,
-  'rmsprop': tf.train.RMSPropOptimizer,
-  'adam': tf.train.AdamOptimizer,
-}
-
-optimizer = optimizers[assignments.setdefault('optimizer', 'adam')]
+optimizer = Adam(lr=assignments.setdefault('log_learning_rate', -3))
