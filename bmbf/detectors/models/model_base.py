@@ -1,10 +1,14 @@
 from keras.layers import Input
 from keras.models import Model
 from keras.optimizers import Adam
+from keras.utils.training_utils import multi_gpu_model
 import numpy as np
 import tensorflow as tf
+import os
 
 from bmbf.detectors.constants import optimizer
+
+gpus = int(os.environ.get('GPUS', '0'))
 
 def safe_log(value):
   return tf.cond(
@@ -33,6 +37,8 @@ class ModelBase(object):
   def __init__(self):
     self.input = Input(shape=(768, 768, 4))
     self.model = Model(inputs=self.input, outputs=self.create_model())
+    if gpus > 1:
+      self.model = multi_gpu_model(self.model, gpus=gpus)
     self.model.compile(
       optimizer=optimizer,
       loss=iou_loss,

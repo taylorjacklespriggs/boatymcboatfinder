@@ -24,7 +24,7 @@ class Sample(object):
     ]
 
   def load_image(self):
-    image_name = 'train/{}'.format(self.image)
+    image_name = 'data/train/{}'.format(self.image)
     pil_image = Image.open(image_name)
     try:
       pil_image.load()
@@ -46,7 +46,7 @@ class Sample(object):
   def __repr__(self):
     return 'Sample(n_segmentations={})'.format(len(self.segmentations))
 
-def load_samples(filename='train_ship_segmentations.csv'):
+def load_samples(filename='data/train_ship_segmentations.csv'):
   with open(filename) as segmentations_fp:
     # skip the header line
     next(segmentations_fp)
