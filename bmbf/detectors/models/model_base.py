@@ -23,8 +23,8 @@ class ModelBase(object):
     self.union = tf.reduce_sum(y) + tf.reduce_sum(self.predicted_labels) - self.intersection
     self.iou = self.intersection / self.union
 
-    self.sum_prediction = tf.reduce_sum(self.model)
     self.sum_masked_prediction = tf.reduce_sum(self.masked_prediction)
+    self.sum_prediction = tf.reduce_sum(self.model) + tf.reduce_sum(y) - self.sum_masked_prediction
     self.log_sum_prediction = safe_log(self.sum_prediction)
     self.log_sum_masked_prediction = safe_log(self.sum_masked_prediction)
     self.loss = self.log_sum_prediction - self.log_sum_masked_prediction
